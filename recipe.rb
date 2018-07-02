@@ -25,6 +25,8 @@ class Recipe
     # TODO: I'm uncomfortable with these classes needing to know about the filesystem.
     #       They should be interacting with some recipe 'repostory' interface, so that recipes
     #       can be stored elsewhere (e.g. database, url, etc).
+    # TODO: additionally, changing behavior of the class with if statements based on some condition
+    #       implies that the behavior should be split between two classes.
     custom = Recipe.custom_path scenario, name
     global = Recipe.global_path scenario, name 
     raise "Recipe '#{name}' does not exist" unless custom.exist? or global.exist?
