@@ -1,4 +1,5 @@
 require_relative 'recipe'
+require_relative 'package'
 
 class Role
   NAME_KEY = 'Name'
@@ -10,7 +11,7 @@ class Role
   def initialize scenario, hash
     self.name = hash[NAME_KEY]
     package_names = hash[PACKAGES_KEY] || []
-    self.packages = package_names
+    self.packages = package_names.map{ |package_name| Package.new package_name }
     recipe_names = hash[RECIPES_KEY] || []
     self.recipes = recipe_names.map{ |recipe_name| Recipe.new scenario, recipe_name }
   end
@@ -18,7 +19,7 @@ class Role
   def to_hash
     {
       NAME_KEY => name,
-      PACKAGES_KEY => packages,
+      PACKAGES_KEY => packages.map{ |package| package.name },
       RECIPES_KEY => recipes.map{ |recipe| recipe.name }
     }
   end
