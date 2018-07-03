@@ -33,8 +33,6 @@ class Recipe
     @name = name
   end
 
-
-
   def path
     return custom_path if custom_path.exist?
     return global_path if global_path.exist?
