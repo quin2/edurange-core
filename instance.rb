@@ -34,7 +34,7 @@ class Instance
       OS_KEY => os,
       IP_ADDRESS_DYNAMIC_KEY => ip_address_dynamic,
       INTERNET_ACCESSIBLE_KEY => internet_accessible,
-      IP_ADDRESS_KEY => ip_address.to_string,
+      IP_ADDRESS_KEY => ip_address.to_s,
       ROLES_KEY => roles.map{ |role| role.name }
     }
   end
@@ -55,6 +55,18 @@ class Instance
     cloud.scenario
   end
 
+  def access
+    scenario.groups.map{ |group| group.access_for self }.compact
+  end
+
+  def groups
+    access.map{ |a| a.group }
+  end
+
+  # i dont like this method: you should just get the players then get their names
+  def player_names
+    groups.flat_map{ |group| group.users }.map{ |user| user.login }
+  end
 
   private
 

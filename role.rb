@@ -27,10 +27,6 @@ class Role
     }
   end
 
-  #def scripts
-  #  []
-  #end
-
   private
 
   attr_writer :packages, :recipes

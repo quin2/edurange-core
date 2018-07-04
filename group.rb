@@ -1,6 +1,6 @@
 require_relative 'access'
 require_relative 'user'
-require_relative 'inpsect'
+require_relative 'inspect'
 
 class Group
   include Inspect
@@ -46,17 +46,23 @@ class Group
     {
       NAME_KEY => name,
       INSTRUCTIONS_KEY => instructions,
-      ACCESS_KEY => access.map{ |a| a.to_hash }
+      ACCESS_KEY => access.map{ |a| a.to_hash },
       USERS_KEY => users.map{ |a| a.to_hash }
     }
   end
 
+  def access_for instance
+    access.find{ |a| a.instance.name == instance.name }
+  end
+
   def ip_visible_for? instance
-    access.find{ |a| a.instance == instance and a.ip_visible? }.nil?
+    a = access_for instance
+    not a.nil? and a.ip_visible?
   end
 
   def administrator_of? instance
-    access.find{ |a| a.instance == instance and a.administrator? }.nil?
+    a = access_for instance
+    not a.nil? and a.administrator?
   end
 
   def name= name
