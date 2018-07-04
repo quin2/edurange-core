@@ -6,7 +6,7 @@ class Role
   PACKAGES_KEY = 'Packages'
   RECIPES_KEY = 'Recipes'
 
-  attr_accessor :scenario, :name, :packages, :recipes
+  attr_reader :scenario, :name, :packages, :recipes
 
   def initialize scenario, hash
     self.name = hash[NAME_KEY]
@@ -24,12 +24,18 @@ class Role
     }
   end
 
-  def scripts
-    []
-  end
+  #def scripts
+  #  []
+  #end
 
   private
 
-  attr_writer :name, :packages, :recipes
+  attr_writer :packages, :recipes
+
+  def name= name
+    raise "Role #{NAME_KEY} must not be empty" if name.blank?
+    raise "Role #{NAME_KEY} '#{name}' does not only contain alphanumeric characters and underscores" if /\W/.match name
+    @name = name
+  end
 
 end
