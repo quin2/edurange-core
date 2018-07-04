@@ -1,5 +1,5 @@
 require 'ipaddress'
-require 'active_support/core_ext/object'
+require 'active_support/core_ext/object/blank'
 require_relative 'subnet'
 
 
