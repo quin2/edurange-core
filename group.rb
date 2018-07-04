@@ -1,15 +1,17 @@
 require_relative 'access'
+require_relative 'user'
 require_relative 'inpsect'
 
 class Group
   include Inspect
 
   attr_accessor :scenario, :instructions, :access
-  attr_reader :name
+  attr_reader :name, :users
 
   NAME_KEY = 'Name'
   INSTRUCTIONS_KEY = 'Instructions'
   ACCESS_KEY = 'Access'
+  USERS_KEY = 'Users'
 
   #def initialize(scenario:, name:, instructions: nil )
   #  self.scenario = scenario
@@ -24,6 +26,8 @@ class Group
     self.instructions = hash[INSTRUCTIONS_KEY]
     access_hashes = hash[ACCESS_KEY] || []
     self.access = access_hashes.map{ |access_hash| Access.new self, access_hash }
+    user_hashes = hash[USERS_KEY] || []
+    @users = user_hashes.map{ |user_hash| User.new self, user_hash }
   end
 
   def self.from_hash scenario, hash
@@ -43,6 +47,7 @@ class Group
       NAME_KEY => name,
       INSTRUCTIONS_KEY => instructions,
       ACCESS_KEY => access.map{ |a| a.to_hash }
+      USERS_KEY => users.map{ |a| a.to_hash }
     }
   end
 
