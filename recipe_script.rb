@@ -15,27 +15,42 @@ class RecipeScript
     to_script @recipe.text
   end
 
-  def content_for instance
+#  def content_for instance
+#    to_script @recipe.text_for instance
+#  end
+
+  def commands_for instance
+    to_commands @recipe.text_for instance
+  end
+
+  def script_for instance
     to_script @recipe.text_for instance
   end
 
   private
 
-  def to_script recipe_contents
+  DEFAULT_CWD = '/'
+
+  def to_commands recipe_contents
     eval recipe_contents
-    x = "#{name} {"
-    x += "  echo running script #{name}\n"
-    x += "  su #{@user}\n" if @user
-    x += "  cd #{@cwd}\n" if @cwd
-    x += "  #{@code}\n" if @code
-    x += "  exit\n" if @user # su creates new session that must be exited
-    x += "  echo done running script #{name}\n"
-    x += "}\n"
-    if @not_if
-      x += "if ! (#{@not_if}); then #{name}(); fi\n"
-    else
-      x += "#{name}();\n"
-    end
+    commands = []
+    commands << "echo running Recipe #{name} as bash script;"
+    commands << "su #{@user};" if @user
+    commands << (@cwd ? "cd #{@cwd};" : "cd #{DEFAULT_CWD};")
+    commands << @code if @code
+    commands << "exit;" if @user # su creates new session that must be exited
+    commands << "echo done running Recipe #{name} as bash script;"
+    return commands
+  end
+
+  def to_script recipe_contents
+    commands = to_commands recipe_contents
+    return commands.join "\n"
+    #if @not_if
+    #  x += "if ! (#{@not_if}); then #{name}(); fi\n"
+    #else
+    #  x += "#{name}();\n"
+    #end
   end
 
   # the following methods might be invoked by the recipe
@@ -86,7 +101,7 @@ class RecipeScript
 
   # Provide a more informative message if script resource attempts to call method we do not implement.
   def method_missing method_id, *arguments, &block
-    raise "Recipe to Script adapter does not handle method '#{method_id}'" if SCRIP_METHODS.include? method_id.id2name
+    raise "Recipe to Script adapter does not handle method '#{method_id}'" if SCRIPT_METHODS.include? method_id.id2name
     super
   end
 
