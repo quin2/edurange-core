@@ -2,8 +2,10 @@ require 'ipaddress'
 require 'active_support/core_ext/object/blank'
 
 require_relative 'instance'
+require_relative 'inspect'
 
 class Subnet
+  include Inspect
 
   attr_reader :cloud, :name, :cidr_block, :instances
 

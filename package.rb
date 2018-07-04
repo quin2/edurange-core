@@ -13,6 +13,10 @@ class Package
     name
   end
 
+  def inspect
+    to_s
+  end
+
 #  def commands_for instance
 #    case instance.os
 #    when 'ubuntu'

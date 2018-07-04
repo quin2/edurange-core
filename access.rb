@@ -1,6 +1,8 @@
+require_relative 'inspect'
 
 # Groups can Access Instances
 class Access
+  include Inspect
 
   INSTANCE_KEY = 'Instance'
   IP_VISIBLE_KEY = 'IP_Visible'

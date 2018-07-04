@@ -8,8 +8,10 @@ require 'active_support/core_ext/object/blank'
 require_relative 'role'
 require_relative 'cloud'
 require_relative 'group'
+require_relative 'inspect'
 
 class Scenario
+  include Inspect
 
   attr_reader :directory, :name, :description, :instructions, :instructions_student, :roles, :clouds, :groups
 
@@ -40,10 +42,6 @@ class Scenario
     hash = YAML.load path.read
     directory = path.dirname
     Scenario.new directory, hash
-  end
-
-  def to_yaml
-    to_hash.to_yaml
   end
 
   def to_hash

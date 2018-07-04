@@ -18,6 +18,14 @@ class Recipe
     return text
   end
 
+  def to_s
+    name
+  end
+
+  def inspect
+    to_s
+  end
+
   private
 
   def name= name

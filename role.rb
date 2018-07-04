@@ -1,7 +1,10 @@
 require_relative 'recipe'
 require_relative 'package'
+require_relative 'inspect'
 
 class Role
+  include Inspect
+
   NAME_KEY = 'Name'
   PACKAGES_KEY = 'Packages'
   RECIPES_KEY = 'Recipes'

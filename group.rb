@@ -1,6 +1,8 @@
 require_relative 'access'
+require_relative 'inpsect'
 
 class Group
+  include Inspect
 
   attr_accessor :scenario, :instructions, :access
   attr_reader :name

@@ -1,6 +1,8 @@
 require 'ipaddress'
+require_relative 'inspect'
 
 class Instance
+  include Inspect
 
   attr_reader :subnet, :name, :os, :ip_address, :ip_address_dynamic, :internet_accessible, :roles
 

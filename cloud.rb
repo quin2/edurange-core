@@ -1,9 +1,11 @@
 require 'ipaddress'
 require 'active_support/core_ext/object/blank'
 require_relative 'subnet'
-
+require_relative 'inspect'
 
 class Cloud
+  include Inspect
+
   attr_reader :scenario, :name, :cidr_block, :subnets
   attr_writer :scenario, :name
 
