@@ -1,3 +1,4 @@
+require 'erubis'
 
 class Recipe
 
@@ -44,7 +45,7 @@ class Recipe
   end
 
   def template?
-    path.extname == 'erb'
+    path.extname.end_with? 'erb'
   end
 
   def Recipe.custom_path scenario, name
