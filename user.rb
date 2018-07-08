@@ -1,5 +1,6 @@
 require 'active_support/core_ext/object/blank'
 require_relative 'inspect'
+require_relative 'password'
 
 class User
   include Inspect
@@ -18,7 +19,12 @@ class User
     raise "User #{LOGIN_KEY} must not be empty" if @login.blank?
     raise "#{self.class.name} #{LONGIN_KEY} '#{@login}' contains invalid characters" unless @login.match /\A[a-zA-z_\-]*\z/
     raise "#{self.class.name} #{LONGIN_KEY} '#{@login}' is more than #{LOGIN_MAX_LENGTH} characters long" if @login.length > LOGIN_MAX_LENGTH
-    @password = hash[PASSWORD_KEY]
+
+    if hash[PASSWORD_KEY]
+      @password = Password.new hash[PASSWORD_KEY]
+    else
+      @password = Password.random
+    end
   end
 
   def to_s
@@ -28,8 +34,13 @@ class User
   def to_hash
     {
       LOGIN_KEY => login,
-      PASSWORD_KEY => password
+      PASSWORD_KEY => password.to_s
     }
+  end
+
+  def password_hash
+    warn 'I want to move this away from User in the future.'
+    password.hash
   end
 
 end
