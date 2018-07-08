@@ -2,10 +2,10 @@ require 'erubis'
 
 class Recipe
 
-  attr_accessor :name, :scenario
+  attr_accessor :name, :directory
 
-  def initialize scenario, name
-    self.scenario = scenario
+  def initialize directory, name
+    @directory = directory
     self.name = name
   end
 
@@ -36,8 +36,8 @@ class Recipe
     #       can be stored elsewhere (e.g. database, url, etc).
     # TODO: additionally, changing behavior of the class with if statements based on some condition
     #       implies that the behavior should be split between two classes.
-    custom = Recipe.custom_path scenario, name
-    global = Recipe.global_path scenario, name 
+    custom = Recipe.custom_path directory, name
+    global = Recipe.global_path directory, name
     raise "Recipe '#{name}' does not exist" unless custom.exist? or global.exist?
     @name = name
   end
@@ -56,20 +56,20 @@ class Recipe
     path.extname.end_with? 'erb'
   end
 
-  def Recipe.custom_path scenario, name
-    scenario.directory + 'recipes' + "#{name}.rb"
+  def Recipe.custom_path directory, name
+    directory + 'recipes' + "#{name}.rb"
   end
 
   def custom_path
-    Recipe.custom_path scenario, name
+    Recipe.custom_path directory, name
   end
 
-  def Recipe.global_path scenario, name
-    scenario.directory + '..' + '..' + 'recipes' + "#{name}.rb.erb"
+  def Recipe.global_path directory, name
+    directory + '..' + '..' + 'recipes' + "#{name}.rb.erb"
   end
 
   def global_path
-    Recipe.global_path scenario, name
+    Recipe.global_path directory, name
   end
 
 end

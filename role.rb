@@ -16,7 +16,7 @@ class Role
     package_names = hash[PACKAGES_KEY] || []
     self.packages = package_names.map{ |package_name| Package.new package_name }
     recipe_names = hash[RECIPES_KEY] || []
-    self.recipes = recipe_names.map{ |recipe_name| Recipe.new scenario, recipe_name }
+    self.recipes = recipe_names.map{ |recipe_name| Recipe.new scenario.directory, recipe_name }
   end
 
   def to_hash
