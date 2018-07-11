@@ -5,6 +5,7 @@ class Password
 
   ALPHABET = ('a'..'z').to_a + ('A'..'Z').to_a + ('0'..'9').to_a
   DEFAULT_LENGTH = 10
+  MINIMUM_LENGTH = 6
 
   def Password.random
     Password.new (1..DEFAULT_LENGTH) \
@@ -13,7 +14,11 @@ class Password
   end
 
   def initialize password
-    raise "Password must not be empty" if password.blank?
+    raise "Password must not be empty." if password.blank?
+    password.each_char do |c|
+      raise "Password contains invalid character '#{c}'." unless ALPHABET.include? c
+    end
+    raise "Password must be at least 6 characters." if password.length < MINIMUM_LENGTH
     @password = password
   end
 

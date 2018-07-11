@@ -1,5 +1,6 @@
 require 'ipaddress'
 require_relative 'inspect'
+require_relative 'user_access'
 
 class Instance
   include Inspect
@@ -39,12 +40,12 @@ class Instance
     }
   end
 
-  def cookbook
-    recipes.map{ |recipe| recipe.text_for self }.join('\n')
-  end
-
   def recipes
     roles.flat_map{ |role| role.recipes }
+  end
+
+  def packages
+    roles.flat_map{ |role| role.recipe }
   end
 
   def cloud
@@ -56,6 +57,8 @@ class Instance
   end
 
   def access
+    # since instances are members of groups (that is the access relationship is owned by group),
+    # we must find references to this instance in the groups.
     scenario.groups.map{ |group| group.access_for self }.compact
   end
 
@@ -63,9 +66,8 @@ class Instance
     access.map{ |a| a.group }
   end
 
-  # i dont like this method: you should just get the players then get their names
-  def player_names
-    groups.flat_map{ |group| group.users }.map{ |user| user.login }
+  def users
+    groups.flat_map{ |group| group.users }.map{ |user| UserAccess.new user, (user.group.access_for self) }
   end
 
   private

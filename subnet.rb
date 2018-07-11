@@ -2,6 +2,7 @@ require 'ipaddress'
 require 'active_support/core_ext/object/blank'
 
 require_relative 'instance'
+require_relative 'legacy_instance'
 require_relative 'inspect'
 
 class Subnet
@@ -20,7 +21,7 @@ class Subnet
     self.internet_accessible = hash[INTERNET_ACCESSIBLE_KEY] || false
     self.cidr_block = hash[CIDR_BLOCK_KEY]
     instance_hashes = hash[INSTANCES_KEY] || []
-    self.instances = instance_hashes.map{ |instance_hash| Instance.new self, instance_hash }
+    self.instances = instance_hashes.map{ |instance_hash| LegacyInstance.new (Instance.new self, instance_hash) }
   end
 
   def to_hash
