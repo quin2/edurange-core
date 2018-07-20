@@ -7,6 +7,7 @@ class Recipe
   def initialize path, name
     raise "Recipe file '#{path}' does not exist" unless path.file?
     @path = path
+    raise "Recipe name must not be epty" if name.blank?
     raise "Recipe name '#{name}' must only contain alphanumeric characters and underscores" if /\W/.match name
     @name = name
   end
