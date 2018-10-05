@@ -1,0 +1,25 @@
+Name: Barebones
+Description: 'A very basic scenario.'
+Instructions: 'No instructions'
+InstructionsStudent: 'No instructions'
+Groups:
+- Name: DefaultGroup
+  Users:
+  - Login: james
+    password: super_secret
+  Access:
+  - Instance: DefaultInstance
+    Administrator: true
+    IP_Visible: true
+Clouds:
+- Name: DefaultCloud
+  CIDR_Block: 10.0.0.0/24
+  Subnets:
+  - Name: DefaultSubnet
+    CIDR_Block: 10.0.0.0/24
+    Internet_Accessible: true
+    Instances:
+    - Name: DefaultInstance
+      OS: ubuntu
+      IP_Address: 10.0.0.6
+      Internet_Accessible: true

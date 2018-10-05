@@ -93,7 +93,7 @@ class Scenario
   end
 
   def roles= roles
-    raise "Scenario '#{ROLES_KEY}' must not be empty" if roles.blank?
+    raise "Scenario '#{ROLES_KEY}' must not be empty" if roles.nil?
     @roles = roles
   end
 

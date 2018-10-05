@@ -8,7 +8,7 @@ require_relative 'inspect'
 class Subnet
   include Inspect
 
-  attr_reader :cloud, :name, :cidr_block, :instances
+  attr_reader :cloud, :name, :cidr_block, :instances, :internet_accessible
 
   NAME_KEY = 'Name'
   CIDR_BLOCK_KEY = 'CIDR_Block'
@@ -32,6 +32,12 @@ class Subnet
       INSTANCES_KEY => instances.map{ |instance| instance.to_hash }
     }
   end
+
+  def scenario
+    cloud.scenario
+  end
+
+  alias internet_accessible? internet_accessible
 
   private
 
@@ -60,9 +66,6 @@ class Subnet
     @instances = instances
   end
 
-  def internet_accessible?
-    @internet_accessible
-  end
 
 end
 

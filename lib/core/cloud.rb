@@ -33,6 +33,8 @@ class Cloud
     subnets.flat_map{ |subnet| subnet.instances }
   end
 
+
+  # TODO: weird that cidr_block returns an IPAddress but cidr_block= accepts a string.
   def cidr_block= cidr_block
     ip = IPAddress.parse cidr_block
     raise "Cloud #{CIDR_BLOCK_KEY} subnet mask #{ip.prefix} is not between 16 and 28" unless ip.prefix >= 16 and ip.prefix <= 28

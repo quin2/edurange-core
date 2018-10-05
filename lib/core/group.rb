@@ -5,8 +5,8 @@ require_relative 'inspect'
 class Group
   include Inspect
 
-  attr_accessor :scenario, :instructions, :access
-  attr_reader :name, :users
+  attr_accessor :scenario, :instructions
+  attr_reader :name, :users, :access
 
   NAME_KEY = 'Name'
   INSTRUCTIONS_KEY = 'Instructions'

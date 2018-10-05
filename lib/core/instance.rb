@@ -20,10 +20,11 @@ class Instance
     self.os = hash[OS_KEY]
     self.ip_address_dynamic = hash[IP_ADDRESS_DYNAMIC_KEY] || false
     self.internet_accessible = hash[INTERNET_ACCESSIBLE_KEY] || false
+    raise "If subnet '#{subnet.name}' is not internet accessible then instance #{name} should not be either." if !subnet.internet_accessible && internet_accessible
     self.ip_address = hash[IP_ADDRESS_KEY]
     role_names = hash[ROLES_KEY] || []
     self.roles = role_names.map do |role_name|
-      role = scenario.roles.find{ |role| role.name == role_name }
+      role = scenario.roles.find{ |r| r.name == role_name }
       raise "Instance #{name} Role #{role_name} does not exist" if role.nil?
       role
     end
@@ -38,6 +39,16 @@ class Instance
       IP_ADDRESS_KEY => ip_address.to_s,
       ROLES_KEY => roles.map{ |role| role.name }
     }
+  end
+
+  # TODO alias?
+  def internet_accessible?
+    internet_accessible
+  end
+
+  def startup_script
+    #"#!/bin/bash\n\n" + "echo hello world;\n"
+    Pathname.new("./startup_script.sh").read
   end
 
   def recipes
@@ -95,7 +106,7 @@ class Instance
   end
 
   def roles= roles
-    raise "Instance #{ROLES_KEY} must not be empty" if roles.blank?
+    raise "Instance #{ROLES_KEY} must not be empty" if roles.nil?
     @roles = roles
   end
 end
