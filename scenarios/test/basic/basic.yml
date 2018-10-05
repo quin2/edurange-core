@@ -6,7 +6,7 @@ Groups:
 - Name: DefaultGroup
   Users:
   - Login: james
-    password: super_secret
+    Password: s00p3rs3cr37
   Access:
   - Instance: DefaultInstance
     Administrator: true

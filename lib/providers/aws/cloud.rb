@@ -43,6 +43,12 @@ module EDURange
 
         Cloud.tag_cloud(@config, @vpc)
 
+        # temporary
+#        key_pair = @ec2.create_key_pair({
+#          key_name: 'DUMMY'
+#        })
+#        Pathname.new("./#{key_pair.name}.pem").write(key_pair.key_material)
+
         gateway = Cloud.create_internet_gateway(@ec2, @vpc)
 
         Cloud.configure_default_security_group(@vpc)

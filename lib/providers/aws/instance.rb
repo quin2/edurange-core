@@ -34,6 +34,11 @@ module EDURange
 
         @instance.load
 
+#        (0 .. 10).each do |i|
+#          logger.debug Base64.decode64(@instance.console_output(latest: true).output)
+#          sleep 10
+#        end
+
         logger.info 'starting instance',
           scenario: @config.scenario.name,
           cloud: @config.cloud.name,
@@ -73,7 +78,8 @@ module EDURange
           max_count: 1,
           min_count: 1,
           instance_type: 't1.micro', # TODO, also shouldn't be hardcoded?
-          user_data: Base64.encode64(config.startup_script)
+          user_data: Base64.encode64(config.startup_script),
+#          key_name: key_name
         }).first
       end
 
@@ -99,6 +105,7 @@ module EDURange
           allocation_id: elastic_ip_allocation.allocation_id,
           instance_id: instance.id
         })
+        logger.trace 'public ip address assigned', instance: instance.id, ip_address: elastic_ip_allocation.public_ip
       end
 
       def Instance.unassign_public_ip_address(instance)
