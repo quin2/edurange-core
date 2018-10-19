@@ -21,8 +21,6 @@ class AWSTest < Minitest::Test
 
     logger.info 'authenticate with', login: user.login, password: user.password.to_s
 
-    gets
-
     begin
       Net::SSH.start(
         instance.public_ip_address,

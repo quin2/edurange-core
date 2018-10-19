@@ -16,13 +16,19 @@ module EDURange
 
       delegate [:name, :os, :ip_address, :ip_address_dynamic, :users, :administrators, :recipes, :packages, :cloud, :scenario, :internet_accessible?, :roles] => :@config
 
-      def start(ec2, subnet)
+      def start(ec2, s3, subnet)
         logger.info 'starting instance',
           scenario: @config.scenario.name,
           cloud: @config.cloud.name,
           subnet: @config.subnet.name
 
-        @instance = Instance.create_instance(@config, subnet)
+        bucket = s3.bucket('edurange-playgroun-stuff')
+        bucket.create() if not bucket.exists?
+
+        @status_object = bucket.object('status')
+        status_object_url = @status_object.presigned_url(:put)
+
+        @instance = Instance.create_instance(@config, subnet, status_object_url)
 
         logger.info "instance id: #{@instance.id}"
 
@@ -33,6 +39,13 @@ module EDURange
         Instance.assign_public_ip_address(@instance) if internet_accessible?
 
         @instance.load
+
+
+        # TODO weird and hacky, this status stuff should be in it's own class not literring this one
+        while not @status_object.exists?
+          logger.info "waiting for status page"
+          sleep 30
+        end
 
 #        (0 .. 10).each do |i|
 #          logger.debug Base64.decode64(@instance.console_output(latest: true).output)
@@ -52,6 +65,10 @@ module EDURange
 
         @instance.terminate
         @instance.wait_until_terminated
+
+        # delete s3 bucket
+        @status_object.delete if @status_object
+
         logger.trace 'instance stopped'
       end
 
@@ -71,14 +88,14 @@ module EDURange
         }).first
       end
 
-      def Instance.create_instance(config, subnet)
+      def Instance.create_instance(config, subnet, status_object_url)
         subnet.create_instances({
           image_id: 'ami-40184038', # TODO, just hardcoding the ami right now.
           private_ip_address: config.ip_address.to_s,
           max_count: 1,
           min_count: 1,
           instance_type: 't1.micro', # TODO, also shouldn't be hardcoded?
-          user_data: Base64.encode64(config.startup_script),
+          user_data: Base64.encode64(config.startup_script.gsub("{{status_object_url}}", status_object_url)), # todo use actual templates eventually.
 #          key_name: key_name
         }).first
       end

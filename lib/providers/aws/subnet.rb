@@ -23,7 +23,7 @@ module EDURange
         not @subnet.nil?
       end
 
-      def start(ec2, vpc, gateway)
+      def start(ec2, s3, vpc, gateway)
         logger.trace 'starting subnet', scenario: @config.scenario.name, cloud: @config.cloud.name, subnet: @config.name
         #raise "Must start cloud before starting subnet." unless vpc
         raise "Subnet #{name} already started" if started?
@@ -51,7 +51,7 @@ module EDURange
         end
 
         instances.each do |instance|
-          instance.start(ec2, @subnet)
+          instance.start(ec2, s3, @subnet)
         end
         logger.trace 'started subnet', scenario: @config.scenario.name, cloud: @config.cloud.name, subnet: @config.name
       end

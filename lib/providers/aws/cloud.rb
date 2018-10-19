@@ -8,8 +8,9 @@ module EDURange
       include SemanticLogger::Loggable
       extend Forwardable
 
-      def initialize(ec2, cloud_config, vpc = nil)
+      def initialize(ec2, s3, cloud_config, vpc = nil)
         @config = cloud_config
+        @s3 = s3
         @ec2 = ec2
         @vpc = vpc
       end
@@ -54,7 +55,7 @@ module EDURange
         Cloud.configure_default_security_group(@vpc)
 
         subnets.each do |subnet|
-          subnet.start(@ec2, @vpc, gateway)
+          subnet.start(@ec2, @s3, @vpc, gateway)
         end
 
         logger.trace "started cloud", name: @config.name, scenario: @config.scenario.name

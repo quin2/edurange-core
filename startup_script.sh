@@ -15,3 +15,6 @@ apt-get install netcat
 echo "Hello World" | nc 138.197.210.249 50000
 
 service ssh restart
+
+curl -X PUT -d "Hello, World." "{{status_object_url}}"
+
