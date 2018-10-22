@@ -9,24 +9,23 @@ module EDURange
       include SemanticLogger::Loggable
       extend Forwardable
 
-      def initialize(instance_config)
+      def initialize(ec2, s3, instance_config)
+        @ec2 = ec2
+        @s3 = s3
         @config = instance_config
         @instance = nil
       end
 
       delegate [:name, :os, :ip_address, :ip_address_dynamic, :users, :administrators, :recipes, :packages, :cloud, :scenario, :internet_accessible?, :roles] => :@config
 
-      def start(ec2, s3, subnet)
-        logger.info 'starting instance',
+      def start(subnet)
+        logger.info event: 'starting_instance',
           scenario: @config.scenario.name,
           cloud: @config.cloud.name,
-          subnet: @config.subnet.name
+          subnet: @config.subnet.name,
+          instance: @config.name
 
-        bucket = s3.bucket('edurange-playgroun-stuff')
-        bucket.create() if not bucket.exists?
-
-        @status_object = bucket.object('status')
-        status_object_url = @status_object.presigned_url(:put)
+        status_object_url = status_s3_object.presigned_url(:put)
 
         @instance = Instance.create_instance(@config, subnet, status_object_url)
 
@@ -38,42 +37,59 @@ module EDURange
 
         Instance.assign_public_ip_address(@instance) if internet_accessible?
 
+        # reload instance data
         @instance.load
 
-
         # TODO weird and hacky, this status stuff should be in it's own class not literring this one
-        while not @status_object.exists?
-          logger.info "waiting for status page"
-          sleep 30
+        while not status_s3_object.exists?
+          duration = 15
+          logger.trace "waiting #{duration}s for status page"
+          sleep(duration)
         end
 
-#        (0 .. 10).each do |i|
-#          logger.debug Base64.decode64(@instance.console_output(latest: true).output)
-#          sleep 10
-#        end
-
-        logger.info 'starting instance',
+        logger.info event: 'instance_started',
           scenario: @config.scenario.name,
           cloud: @config.cloud.name,
-          subnet: @config.subnet.name
+          subnet: @config.subnet.name,
+          instance: @config.name
       end
 
       def stop
-        logger.trace 'stopping instance'
+        logger.info event: 'stopping_instance',
+          scenario: @config.scenario.name,
+          cloud: @config.cloud.name,
+          subnet: @config.subnet.name,
+          instance: @config.name
 
         Instance.unassign_public_ip_address(@instance) if internet_accessible?
 
         @instance.terminate
         @instance.wait_until_terminated
 
-        # delete s3 bucket
-        @status_object.delete if @status_object
+        # delete s3 object
+        status_s3_object.delete
 
-        logger.trace 'instance stopped'
+        logger.info event: 'instance_stopped',
+          scenario: @config.scenario.name,
+          cloud: @config.cloud.name,
+          subnet: @config.subnet.name,
+          instance: @config.name
       end
 
       def public_ip_address
         @instance.public_ip_address if @instance
+      end
+
+      private
+
+      def status_s3_object
+        @status_s3_object ||= Instance.status_s3_object @s3
+      end
+
+      def Instance.status_s3_object s3
+         bucket = s3.bucket('edurange-playground')
+         bucket.create() if not bucket.exists?
+         bucket.object('status') # TODO, needs to be unique identifier for this scenario/instance
       end
 
       # retrieves instance from subnet with correct name.

@@ -8,11 +8,11 @@ module EDURange
       include SemanticLogger::Loggable
       extend Forwardable
 
-      def initialize(ec2, s3, cloud_config, vpc = nil)
+      def initialize(ec2, s3, cloud_config)
         @config = cloud_config
         @s3 = s3
         @ec2 = ec2
-        @vpc = vpc
+        @vpc = nil
       end
 
 #      def Cloud.create(cloud_config)
@@ -26,10 +26,27 @@ module EDURange
 #        Cloud.new(ec2, cloud_config, vpc)
 #      end
 
+#      def already_existing_vpc
+#        @ec2.vpcs({
+#          filters: [
+#            {
+#              name: "tag:Name",
+#              values: [@config.name],
+#            },
+#            {
+#              name: "tag:ScenarioName",
+#              values: [@config.scenario.name],
+#            },
+#          ]
+#       }).first
+#      end
+
       delegate [:name, :cidr_block, :scenario] => :@config
 
       def subnets
-        @subnets ||= @config.subnets.map{|subnet| EDURange::AWS::Subnet.new(subnet)}
+        @subnets ||= @config.subnets.map do |subnet_config|
+          EDURange::AWS::Subnet.new(@ec2, @s3, subnet_config)
+        end
       end
 
       def started?
@@ -37,7 +54,10 @@ module EDURange
       end
 
       def start
-        logger.trace "starting cloud", name: @config.name, scenario: @config.scenario.name
+        logger.info event: 'starting_cloud',
+          name: @config.name,
+          scenario: @config.scenario.name
+
         raise "Cloud #{name} already started" if started?
 
         @vpc = @ec2.create_vpc({ cidr_block: cidr_block.to_string })
@@ -55,16 +75,26 @@ module EDURange
         Cloud.configure_default_security_group(@vpc)
 
         subnets.each do |subnet|
-          subnet.start(@ec2, @s3, @vpc, gateway)
+          subnet.start(@vpc, gateway)
         end
 
-        logger.trace "started cloud", name: @config.name, scenario: @config.scenario.name
+        logger.info event: 'cloud_started',
+          name: @config.name,
+          scenario: @config.scenario.name
       end
 
       def stop
+        logger.info event: 'stopping_cloud',
+          name: @config.name,
+          scenario: @config.scenario.name
+
         subnets.each{ |subnet| subnet.stop }
         Cloud.delete_internet_gateway(@vpc)
         @vpc.delete
+
+        logger.info event: 'cloud_stopped',
+          name: @config.name,
+          scenario: @config.scenario.name
       end
 
       def Cloud.tag_cloud(config, vpc)

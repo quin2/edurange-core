@@ -1,4 +1,4 @@
-require 'minitest/autorun'
+require_relative '../test_helper.rb'
 
 require 'core/scenario'
 require 'providers/aws'
@@ -28,12 +28,11 @@ class AWSTest < Minitest::Test
         password: user.password.to_s,
         non_interactive: true
       ) do |ssh|
-        puts "we connected via ssh"
-        puts ssh.exec! 'ls /'
+        logger.info 'we connected via ssh'
+        logger.info ssh.exec! 'cat /home/james/message'
       end
-    rescue
-      logger.error 'error connecting to instance'
-      raise
+    rescue e
+      exception_details(e, 'Log on to instance with ssh')
     ensure
       scenario.stop
     end
