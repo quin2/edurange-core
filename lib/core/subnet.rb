@@ -45,9 +45,9 @@ class Subnet
 
   def cidr_block= cidr_block
     ip = IPAddress.parse cidr_block
-    raise "Subnet #{CIDR_BLOCK_KEY} #{ip.to_string} must be IPv4" unless ip.ipv4?
-    raise "Subnet #{CIDR_BLOCK_KEY} #{ip.to_string} is not contained in Cloud #{CIDR_BLOCK_KEY} #{cloud.cidr_block.to_string}" unless cloud.cidr_block.include? ip
-    raise "Subnet #{CIDR_BLOCK_KEY} #{ip.to_string} is not a valid network" unless ip.network?
+    raise ArgumentError, "Subnet #{CIDR_BLOCK_KEY} #{ip.to_string} must be IPv4" unless ip.ipv4?
+    raise ArgumentError, "Subnet #{CIDR_BLOCK_KEY} #{ip.to_string} is not a valid network" unless ip.network?
+    raise ArgumentError, "Subnet #{CIDR_BLOCK_KEY} #{ip.to_string} is not contained in Cloud #{CIDR_BLOCK_KEY} #{cloud.cidr_block.to_string}" unless cloud.cidr_block.include? ip
     @cidr_block = ip
   end
 
@@ -65,7 +65,6 @@ class Subnet
     raise "Subnet contains Instances with duplicate ip_address(es): #{duplicates.join(',')}" if duplicates.count > 0
     @instances = instances
   end
-
 
 end
 

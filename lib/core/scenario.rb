@@ -67,47 +67,45 @@ class Scenario
   private
 
   def directory= dir
-    raise "Scenario directory '#{dir}' does exist" unless File.directory?(dir)
+    raise ArgumentError, "Scenario directory '#{dir}' does not exist" unless File.directory?(dir)
     @directory = dir
   end
 
   def name= name
-    raise "Scenario '#{NAME_KEY}' must not be empty" if name.blank?
-    raise "Scenario '#{NAME_KEY}' can only contain alphanumeric characters and underscores" if /\W/.match name
+    raise ArgumentError, "Scenario '#{NAME_KEY}' must not be empty" if name.blank?
+    raise ArgumentError, "Scenario '#{NAME_KEY}' can only contain alphanumeric characters and underscores" if /\W/.match name
     @name = name
   end
 
   def description= description
-    raise "Scenario '#{DESCRIPTION_KEY}' must not be empty" if description.blank?
+    raise ArgumentError, "Scenario '#{DESCRIPTION_KEY}' must not be empty" if description.blank?
     @description = description
   end
 
   def instructions= instructions
-    raise "Scenario '#{INSTRUCTIONS_KEY}' must not be empty" if instructions.blank?
+    raise ArgumentError, "Scenario '#{INSTRUCTIONS_KEY}' must not be empty" if instructions.blank?
     @instructions = instructions
   end
 
   def instructions_student= instructions_student
-    raise "Scenario '#{INSTRUCTIONS_STUDENT_KEY}' must not be empty" if instructions_student.blank?
+    raise ArgumentError, "Scenario '#{INSTRUCTIONS_STUDENT_KEY}' must not be empty" if instructions_student.blank?
     @instructions_student = instructions_student
   end
 
   def roles= roles
-    raise "Scenario '#{ROLES_KEY}' must not be empty" if roles.nil?
+    raise ArgumentError, "Scenario '#{ROLES_KEY}' must not be empty" if roles.nil?
     @roles = roles
   end
 
   def clouds= clouds
-    raise "Scenario '#{CLOUDS_KEY}' must not be empty" if clouds.blank?
+    raise ArgumentError, "Scenario '#{CLOUDS_KEY}' must not be empty" if clouds.blank?
     @clouds = clouds
   end
 
   def groups= groups
-    raise "Scenario '#{GROUPS_KEY}' must not be empty" if groups.blank?
+    raise ArgumentError, "Scenario '#{GROUPS_KEY}' must not be empty" if groups.blank?
     @groups = groups
   end
-
-
 
 end
 

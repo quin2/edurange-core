@@ -10,7 +10,10 @@ class Access
 
   def initialize group, hash
     self.group = group
-    self.instance = group.scenario.instances.find{ |instance| instance.name == hash[INSTANCE_KEY] }
+    instance_name = hash[INSTANCE_KEY]
+    instance = group.scenario.instances.find{ |instance| instance.name == instance_name }
+    raise ArgumentError, "Group #{group.name} references non-existant Instance #{instance_name}" unless not instance.nil?
+    self.instance = instance
     self.ip_visible = hash[IP_VISIBLE_KEY] || false
     self.administrator = hash[ADMINISTRATOR_KEY] || false
   end
