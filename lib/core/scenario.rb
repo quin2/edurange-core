@@ -64,6 +64,7 @@ class Scenario
     clouds.flat_map{ |cloud| cloud.instances }
   end
 
+  private :to_hash
   private
 
   def directory= dir

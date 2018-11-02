@@ -46,6 +46,7 @@ class Instance
     internet_accessible
   end
 
+  # TODO: start-up script is provdier aware. this shouldnt be here
   def startup_script
     #"#!/bin/bash\n\n" + "echo hello world;\n"
     Pathname.new("./startup_script.sh").read
