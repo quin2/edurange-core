@@ -12,7 +12,13 @@ module EDURange
         @config = cloud_config
         @s3 = s3
         @ec2 = ec2
-        @vpc = nil
+        @vpc = Cloud.preexisting_vpc(ec2, self)
+      end
+
+      # a globally unique identifier for this EduRange instance.
+      def identifier
+        # todo: needs additional identifier to differentiate between instances of scenarios.
+        "edurange:#{scenario.name}/#{name}"
       end
 
 #      def Cloud.create(cloud_config)
@@ -26,20 +32,15 @@ module EDURange
 #        Cloud.new(ec2, cloud_config, vpc)
 #      end
 
-#      def already_existing_vpc
-#        @ec2.vpcs({
-#          filters: [
-#            {
-#              name: "tag:Name",
-#              values: [@config.name],
-#            },
-#            {
-#              name: "tag:ScenarioName",
-#              values: [@config.scenario.name],
-#            },
-#          ]
-#       }).first
-#      end
+      def Cloud.preexisting_vpc(ec2, config)
+        c = ec2.vpcs({
+          filters: [
+            { name: 'tag:Name', values: [config.identifier] }
+          ]
+        }).first
+        logger.trace 'found preexisting vpc' if c
+        return c
+      end
 
       delegate [:name, :cidr_block, :scenario] => :@config
 
@@ -49,8 +50,32 @@ module EDURange
         end
       end
 
+      def vpc
+        @vpc
+      end
+
+      def created?
+        not vpc.nil? and tagged?
+      end
+
       def started?
-        not @vpc.nil?
+        created? and subnets.all? do |subnet|
+          subnet.started?
+        end
+      end
+
+      def tagged?
+        tags.has_key?('Name')
+      end
+
+      def tags
+        ts = {}
+        if vpc then
+          vpc.tags.each do |tag|
+            ts[tag.key] = tag.value
+          end
+        end
+        return ts
       end
 
       def start
@@ -62,7 +87,7 @@ module EDURange
 
         @vpc = @ec2.create_vpc({ cidr_block: cidr_block.to_string })
 
-        Cloud.tag_cloud(@config, @vpc)
+        Cloud.tag_cloud(self, @vpc)
 
         # temporary
 #        key_pair = @ec2.create_key_pair({
@@ -100,9 +125,10 @@ module EDURange
       def Cloud.tag_cloud(config, vpc)
         vpc.create_tags({
           tags: [
-            {key: 'Name', value: config.name},
+            {key: 'Name',         value: config.identifier},
+            {key: 'CloudName',    value: config.name},
             {key: 'ScenarioName', value: config.scenario.name},
-            {key: 'DateCreated', value: DateTime.now.iso8601}
+            {key: 'DateCreated',  value: DateTime.now.iso8601},
           ]
         })
       end

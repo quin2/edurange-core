@@ -13,10 +13,16 @@ module EDURange
         @ec2 = ec2
         @s3 = s3
         @config = subnet_config
-        @subnet = nil
+        @subnet = Subnet.preexisting_aws_subnet(ec2, self)
       end
 
-      delegate [:name, :cidr_block, :internet_accessible?] => :@config
+      delegate [:name, :cidr_block, :internet_accessible?, :scenario, :cloud] => :@config
+
+      # a globally unique identifier for this EduRange instance.
+      def identifier
+        # todo: needs additional identifier to differentiate between instances of scenarios.
+        "edurange:#{scenario.name}/#{cloud.name}/#{name}"
+      end
 
       def instances
         @instances ||= @config.instances.map do |instance_config|
@@ -24,8 +30,14 @@ module EDURange
         end
       end
 
-      def started?
+      def created?
         not @subnet.nil?
+      end
+
+      def started?
+        created? and instances.all? do |instance|
+          instance.started?
+        end
       end
 
       def start(vpc, gateway)
@@ -41,7 +53,7 @@ module EDURange
           cidr_block: cidr_block.to_string
         })
 
-        Subnet.tag_subnet(@config, @subnet)
+        Subnet.tag_subnet(self, @subnet)
 
         route_table = vpc.create_route_table
         Subnet.tag_route_table(@config, route_table)
@@ -65,7 +77,7 @@ module EDURange
       end
 
       def stop
-        logger.info event: 'stopping_subnet'
+        logger.info event: 'stopping_subnet',
           scenario: @config.scenario.name,
           cloud: @config.cloud.name,
           subnet: @config.name
@@ -90,7 +102,7 @@ module EDURange
 
         @subnet.delete
 
-        logger.info event: 'subnet_stopped'
+        logger.info event: 'subnet_stopped',
           scenario: @config.scenario.name,
           cloud: @config.cloud.name,
           subnet: @config.name
@@ -100,6 +112,7 @@ module EDURange
         subnet.create_tags({
           tags: [
             {key: 'Name', value: config.name},
+            {key: 'SubnetName', value: config.name},
             {key: 'CloudName', value: config.cloud.name},
             {key: 'ScenarioName', value: config.scenario.name},
             {key: 'DateCreated', value: DateTime.now.iso8601 }
@@ -130,6 +143,17 @@ module EDURange
           return nil
         end
       end
+
+      def Subnet.preexisting_aws_subnet(ec2, config)
+        s = ec2.subnets({
+          filters: [
+            {name: 'tag:Name', values: [config.identifier]},
+          ]
+        }).first
+        logger.trace 'found preexisting aws subnet' if s
+        return s
+      end
+
     end
   end
 end

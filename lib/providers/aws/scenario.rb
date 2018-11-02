@@ -14,10 +14,20 @@ module EDURange
         @config = scenario
       end
 
+      # a globally unique identifier for this EduRange instance.
+      def identifier
+        # todo: needs additional identifier to differentiate between instances of scenarios.
+        "edurange:#{name}"
+      end
+
       delegate [:name, :description, :roles, :groups] => :@config
 
       def clouds
         @clouds ||= @config.clouds.map{ |cloud| EDURange::AWS::Cloud.new(@ec2, @s3, cloud) }
+      end
+
+      def started?
+        clouds.all? { |cloud| cloud.started? }
       end
 
       def start

@@ -13,10 +13,20 @@ module EDURange
         @ec2 = ec2
         @s3 = s3
         @config = instance_config
-        @instance = nil
+        @instance = Instance.preexisting_aws_instance(ec2, self)
       end
 
-      delegate [:name, :os, :ip_address, :ip_address_dynamic, :users, :administrators, :recipes, :packages, :cloud, :scenario, :internet_accessible?, :roles] => :@config
+      delegate [:name, :os, :ip_address, :ip_address_dynamic, :users, :administrators, :recipes, :packages, :cloud, :scenario, :subnet, :internet_accessible?, :roles] => :@config
+
+      # a globally unique identifier for this EduRange instance.
+      def identifier
+        # todo: needs additional identifier to differentiate between instances of scenarios.
+        "edurange:#{scenario.name}/#{cloud.name}/#{subnet.name}/#{self.name}"
+      end
+
+      def started?
+        (not @instance.nil?) and status_s3_object.exists?
+      end
 
       def start(subnet)
         logger.info event: 'starting_instance',
@@ -25,17 +35,15 @@ module EDURange
           subnet: @config.subnet.name,
           instance: @config.name
 
-        status_object_url = status_s3_object.presigned_url(:put)
-
-        @instance = Instance.create_instance(@config, subnet, status_object_url)
+        @instance = Instance.create_instance(@config, subnet, status_s3_object_put_url)
 
         logger.info "instance id: #{@instance.id}"
 
-        Instance.tag_instance(@config, @instance)
+        Instance.tag_instance(self, @instance)
 
         @instance.wait_until_running
 
-        Instance.assign_public_ip_address(@instance) if internet_accessible?
+        Instance.assign_public_ip_address(@instance, self) if internet_accessible?
 
         # reload instance data
         @instance.load
@@ -77,13 +85,17 @@ module EDURange
       end
 
       def public_ip_address
-        @instance.public_ip_address if @instance
+        IPAddress.parse @instance.public_ip_address if @instance
       end
 
       private
 
       def status_s3_object
         @status_s3_object ||= Instance.status_s3_object @s3
+      end
+
+      def status_s3_object_put_url
+        status_s3_object.presigned_url(:put)
       end
 
       def Instance.status_s3_object s3
@@ -93,16 +105,16 @@ module EDURange
       end
 
       # retrieves instance from subnet with correct name.
-      def Instance.fetch(config, subnet)
-        subnet.instances({
-          filters: [
-            {
-              name: 'tag:Name',
-              values: [config.name]
-            }
-          ]
-        }).first
-      end
+      #def Instance.fetch(config, subnet)
+      #  subnet.instances({
+      #    filters: [
+      #      {
+      #        name: 'tag:Name',
+      #        values: [config.name]
+      #      }
+      #    ]
+      #  }).first
+      #end
 
       def Instance.create_instance(config, subnet, status_object_url)
         subnet.create_instances({
@@ -119,7 +131,8 @@ module EDURange
       def Instance.tag_instance(config, instance)
         instance.create_tags({
           tags: [
-            { key: 'Name', value: config.name },
+            { key: 'Name', value: config.identifier },
+            { key: 'InstanceName', value: config.name },
             { key: 'SubnetName', value: config.subnet.name },
             { key: 'CloudName', value: config.cloud.name },
             { key: 'ScenarioName', value: config.scenario.name },
@@ -128,11 +141,24 @@ module EDURange
         })
       end
 
-      def Instance.assign_public_ip_address(instance)
+      def Instance.assign_public_ip_address(instance, config)
         client = instance.client
         elastic_ip_allocation = client.allocate_address({
           domain: 'vpc'
         });
+
+        # Tag the elastic ip. Great for debugging!
+        # TODO: lots of duplicate tags everywhere, DRY up.
+        client.create_tags({
+          resources: [ elastic_ip_allocation.allocation_id ],
+          tags: [
+            { key: 'InstanceName', value: config.name },
+            { key: 'SubnetName', value: config.subnet.name },
+            { key: 'CloudName', value: config.cloud.name },
+            { key: 'ScenarioName', value: config.scenario.name },
+            { key: 'DateCreated', value: DateTime.now.iso8601 },
+          ]
+        })
 
         client.associate_address({
           allocation_id: elastic_ip_allocation.allocation_id,
@@ -166,6 +192,16 @@ module EDURange
         end
       end
 
+      def Instance.preexisting_aws_instance(ec2, config)
+        i = ec2.instances({
+          filters: [
+            {name: 'tag:Name', values: [config.identifier]},
+            {name: 'instance-state-name', values: ['pending', 'running', 'stopping', 'stopped']},
+          ]
+        }).first
+        logger.trace "found preexisting ec2 instance" if i
+        return i
+      end
     end
   end
 end
