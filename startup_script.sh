@@ -11,7 +11,7 @@ useradd \
       --password $(echo s00p3rs3cr37 | openssl passwd -1 -stdin) \
       james
 
-echo "stuff" > /home/james/message
+echo "Hi there!" > /home/james/message
 chown /home/james/message james
 
 curl -X PUT -d "Hello, World." "{{status_object_url}}"
