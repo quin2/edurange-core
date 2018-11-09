@@ -18,11 +18,18 @@ class User
     raise "User #{LOGIN_KEY} must not be empty" if @login.blank?
     raise "#{self.class.name} #{LOGIN_KEY} '#{@login}' contains invalid characters" unless @login.match (/\A[a-zA-Z_\-]*\z/)
     raise "#{self.class.name} #{LOGIN_KEY} '#{@login}' is more than #{LOGIN_MAX_LENGTH} characters long" if @login.length > LOGIN_MAX_LENGTH
+
     if hash[PASSWORD_KEY]
       @password = Password.new hash[PASSWORD_KEY]
     else
       @password = Password.random
     end
+  end
+
+  # user specific variables
+  def variables
+    # NOTE: this has potentially unexpected behavior: this is where player variables are "instantiated"
+    @variables ||= OpenStruct.new(Hash[group.variables.collect { |var| [var.name, var.value] }])
   end
 
   def to_s
@@ -36,10 +43,10 @@ class User
     }
   end
 
-  def password_hash
-    warn 'I want to move this away from User in the future.'
-    password.hash
-  end
+#  def password_hash
+#    warn 'I want to move this away from User in the future.'
+#    password.hash
+#  end
 
 end
 

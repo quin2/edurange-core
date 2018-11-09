@@ -82,5 +82,18 @@ class ScenarioTest < Minitest::Test
     end
   end
 
+  def test_players
+    scenario = Scenario.new(directory, hash)
+    player = scenario.players.first
+    assert_equal('james', player.login)
+    assert_equal('s00p3rs3cr37', player.password.to_s)
+  end
+
+  def test_player_variable_set
+    scenario = Scenario.new(directory, hash)
+    player = scenario.players.first
+    assert(!player.variables.flag.nil?)
+  end
+
 end
 

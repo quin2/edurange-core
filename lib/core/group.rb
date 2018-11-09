@@ -6,12 +6,14 @@ class Group
   include Inspect
 
   attr_accessor :scenario, :instructions
-  attr_reader :name, :users, :access
+  attr_reader :name, :users, :access, :variables
 
   NAME_KEY = 'Name'
   INSTRUCTIONS_KEY = 'Instructions'
   ACCESS_KEY = 'Access'
   USERS_KEY = 'Users'
+  VARIABLES_KEY = 'Variables'
+  PLAYER_VARIABLES_KEY = 'Player'
 
   #def initialize(scenario:, name:, instructions: nil )
   #  self.scenario = scenario
@@ -28,6 +30,9 @@ class Group
     self.access = access_hashes.map{ |access_hash| Access.new self, access_hash }
     user_hashes = hash[USERS_KEY] || []
     @users = user_hashes.map{ |user_hash| User.new self, user_hash }
+
+    variable_hashes = hash[VARIABLES_KEY] || []
+    @variables = variable_hashes.map{ |variable_hash| Variable.from_hash(variable_hash) }
   end
 
   def self.from_hash scenario, hash
@@ -49,6 +54,11 @@ class Group
       ACCESS_KEY => access.map{ |a| a.to_hash },
       USERS_KEY => users.map{ |a| a.to_hash }
     }
+  end
+
+  # is it users or players?! make up ur mind
+  def players
+    users
   end
 
   def access_for instance

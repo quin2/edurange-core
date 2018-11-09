@@ -64,6 +64,10 @@ class Scenario
     clouds.flat_map{ |cloud| cloud.instances }
   end
 
+  def players
+    groups.flat_map{ |group| group.players }
+  end
+
   private :to_hash
   private
 
