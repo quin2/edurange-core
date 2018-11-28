@@ -17,7 +17,7 @@ end
 desc 'Run docker integration tests'
 Rake::TestTask.new do |t|
   t.name = "test:providers:docker"
-  t.test_files = FileList['test/providers/docker_test.rb']
+  t.test_files = FileList['test/providers/docker/**/*_test.rb']
 end
 
 desc 'Run aws integration tests'
@@ -25,5 +25,4 @@ Rake::TestTask.new do |t|
   t.name = "test:providers:aws"
   t.test_files = FileList['test/providers/aws_test.rb']
 end
-
 

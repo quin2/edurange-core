@@ -1,0 +1,267 @@
+---
+Name: SSH_Inception
+Description: Ssh Inception teaches students the basics of ssh, a secure a program
+  for logging into a remote machine.
+Instructions: Instruct students to connect to the first machine, and further login
+  instructions will appear onscreen once connected. They can also be found in /etc/motd
+InstructionsStudent: Login to the NAT_Instance. Further instructions will be found
+  there.
+Groups:
+- Name: Instructor
+  Access:
+  - Instance: NAT
+    Administrator: false
+    IP_Visible: true
+  - Instance: StartingLine
+    Administrator: true
+    IP_Visible: true
+  - Instance: FirstStop
+    Administrator: true
+    IP_Visible: true
+  - Instance: SecondStop
+    Administrator: true
+    IP_Visible: true
+  - Instance: ThirdStop
+    Administrator: true
+    IP_Visible: true
+  - Instance: FourthStop
+    Administrator: true
+    IP_Visible: true
+  - Instance: FifthStop
+    Administrator: true
+    IP_Visible: true
+  - Instance: SatansPalace
+    Administrator: true
+    IP_Visible: true
+  - Instance: AnonFTP
+    Administrator: true
+    IP_Visible: false
+- Name: Students
+  Access:
+  - Instance: NAT
+    Administrator: false
+    IP_Visible: true
+  - Instance: StartingLine
+    Administrator: false
+    IP_Visible: false
+  - Instance: FirstStop
+    Administrator: false
+    IP_Visible: false
+  - Instance: SecondStop
+    Administrator: false
+    IP_Visible: false
+  - Instance: ThirdStop
+    Administrator: false
+    IP_Visible: false
+  - Instance: FourthStop
+    Administrator: false
+    IP_Visible: false
+  - Instance: FifthStop
+    Administrator: false
+    IP_Visible: false
+  - Instance: SatansPalace
+    Administrator: false
+    IP_Visible: false
+  Users:
+  - Login: james
+    Password: s00p3rs3cr37
+  Variables:
+  - Name: third_stop_private_key
+    Type: openssl_pkey_rsa
+  - Name: fourth_stop_password
+    Type: random
+  - Name: fifth_stop_password
+    Type: random
+  - Name: satans_palace_password
+    Type: random
+  - Name: secret_starting_line
+    Type: random
+  - Name: secret_first_stop
+    Type: random
+  - Name: secret_second_stop
+    Type: random
+  - Name: secret_third_stop
+    Type: random
+  - Name: secret_fourth_stop
+    Type: random
+  - Name: secret_fifth_stop
+    Type: random
+  - Name: master_string
+    Type: random
+Clouds:
+- Name: Cloud1
+  CIDR_Block: 10.0.0.0/16
+  Subnets:
+  - Name: PlayerSubnet
+    CIDR_Block: 10.0.0.0/27
+    Internet_Accessible: true
+    Instances:
+    - Name: NAT
+      OS: nat
+      IP_Address: 10.0.0.2
+      Internet_Accessible: true
+      Roles:
+      - NAT
+    - Name: StartingLine
+      OS: ubuntu
+      IP_Address: 10.0.0.5
+      Internet_Accessible: false
+      Roles:
+      - StartingLine
+      - NetTools
+    - Name: FirstStop
+      OS: ubuntu
+      IP_Address: 10.0.0.7
+      Internet_Accessible: false
+      Roles:
+      - FirstStop
+      - NetTools
+    - Name: SecondStop
+      OS: ubuntu
+      IP_Address: 10.0.0.10
+      Internet_Accessible: false
+      Roles:
+      - SecondStop
+      - NetTools
+    - Name: ThirdStop
+      OS: ubuntu
+      IP_Address: 10.0.0.13
+      Internet_Accessible: false
+      Roles:
+      - ThirdStop
+      - NetTools
+    - Name: FourthStop
+      OS: ubuntu
+      IP_Address: 10.0.0.16
+      Internet_Accessible: false
+      Roles:
+      - FourthStop
+      - NetTools
+    - Name: FifthStop
+      OS: ubuntu
+      IP_Address: 10.0.0.17
+      Internet_Accessible: false
+      Roles:
+      - FifthStop
+      - NetTools
+    - Name: SatansPalace
+      OS: ubuntu
+      IP_Address: 10.0.0.19
+      Internet_Accessible: false
+      Roles:
+      - SatansPalace
+    - Name: AnonFTP
+      OS: ubuntu
+      IP_Address: 10.0.0.14
+      Internet_Accessible: false
+      Roles:
+      - AnonFTP
+Variables:
+- Name: fifth_stop_password_key
+  Type: string
+  Value: 8fddakjfds0s9f
+Roles:
+- Name: NAT
+  Scripts:
+  - nat
+- Name: StartingLine
+  Scripts:
+  - starting_line
+- Name: FirstStop
+  Scripts:
+  - ssh_port_123
+  - first_stop
+- Name: SecondStop
+  Scripts:
+  - second_stop
+- Name: ThirdStop
+  Scripts:
+  - third_stop
+- Name: FourthStop
+  Scripts:
+  - fourth_stop
+  Packages:
+  - iptables # needed for blocking traffic
+- Name: FifthStop
+  Scripts:
+  - fifth_stop
+- Name: SatansPalace
+  Scripts:
+  - ssh_port_666
+  - satans_palace
+- Name: AnonFTP
+  Scripts:
+  - anon_ftp
+  Packages:
+  - vsftpd
+- Name: NetTools
+  Packages:
+  - nmap
+  - iputils-ping
+  - net-tools
+  - ftp
+Scoring:
+- Text: Contents of the file '~/secret' on Starting Line?
+  Type: String
+  Options:
+  - variable-group-player
+  Values:
+  - Value: Students:secret_starting_line
+    Points: '1'
+  Order: 1
+  Points: 1
+- Text: Contents of the file '~/secret' on First Stop?
+  Type: String
+  Options:
+  - variable-group-player
+  Values:
+  - Value: Students:secret_first_stop
+    Points: '1'
+  Order: 2
+  Points: 1
+- Text: Contents of the file '~/secret' on Second Stop?
+  Type: String
+  Options:
+  - variable-group-player
+  Values:
+  - Value: Students:secret_second_stop
+    Points: '1'
+  Order: 3
+  Points: 1
+- Text: Contents of the file '~/secret' on Third Stop?
+  Type: String
+  Options:
+  - variable-group-player
+  Values:
+  - Value: Students:secret_third_stop
+    Points: '1'
+  Order: 4
+  Points: 1
+- Text: Contents of the file '~/secret' on Fourth Stop?
+  Type: String
+  Options:
+  - variable-group-player
+  Values:
+  - Value: Students:secret_fourth_stop
+    Points: '1'
+  Order: 5
+  Points: 1
+- Text: Contents of the file '~/secret' on Fifth Stop?
+  Type: String
+  Options:
+  - variable-group-player
+  Values:
+  - Value: Students:secret_fifth_stop
+    Points: '1'
+  Order: 6
+  Points: 1
+- Text: Proof that your are a SSH Inception Master?
+  Type: String
+  Options:
+  - variable-group-player
+  Values:
+  - Value: Students:master_string
+    Points: '1'
+  Order: 7
+  Points: 1
+

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Adding users to {{name}}
+
+{{# users}}
+useradd \
+      --home-dir /home/{{login}} \
+      --create-home \
+      --shell /bin/bash \
+      {{#administrator?}}
+      --groups sudo \
+      {{/administrator?}}
+      --password $(echo {{password}} | openssl passwd -1 -stdin) \
+      {{login}}
+{{/ users}}

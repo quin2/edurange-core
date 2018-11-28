@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+
+require 'core/scenario'
+require 'providers/docker'
+
+require 'semantic_logger'
+
+SemanticLogger.default_level = :trace
+SemanticLogger.add_appender(io: $stdout, formatter: :color)
+
+def usage
+  "USAGE: #{$PROGRAM_NAME} <scenario file> <command> where command is start | stop"
+end
+
+if ARGV.size < 2 then
+  puts usage
+  exit
+end
+
+scenario_config = Scenario.load_from_yaml_file(ARGV[0])
+scenario = EDURange::Docker.foo(scenario_config)
+
+# puts EDURange::Docker::Instance.find(scenario.instances.first)
+
+puts scenario
+
+case ARGV[1]
+when 'start' then
+  scenario.start
+when 'stop' then
+  scenario.stop
+when 'export'
+  instance = scenario.instances.select{|i| i.name == ARGV[2] }.first
+  instance.with_docker_build_directory do |dir|
+    puts dir.to_path
+    FileUtils.copy_entry(dir.to_path, "./#{instance.name}")
+  end
+else
+  puts usage
+end
+
