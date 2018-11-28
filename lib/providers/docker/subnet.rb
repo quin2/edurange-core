@@ -1,11 +1,18 @@
 require 'providers/logging/instance'
+require 'providers/logging/subnet'
+
 require 'semantic_logger'
 
 class EDURange::Docker::Subnet
   include SemanticLogger::Loggable
+  prepend EDURange::Logging::Subnet
 
   def initialize(subnet_config)
     @subnet_config = subnet_config
+    filter = {
+      name: [@subnet_config.name]
+    }
+    @docker_network = Docker::Network.all(filters: [filter.to_json]).first
   end
 
   # TODO:
@@ -29,7 +36,7 @@ class EDURange::Docker::Subnet
   end
 
   def start
-    @docker_network = Docker::Network.create(docker_network_name, docker_network_parameters)
+    @docker_network = Docker::Network.create(name, docker_network_config)
 
     instances.each do |instance|
       instance.start
@@ -40,14 +47,12 @@ class EDURange::Docker::Subnet
     instances.each do |instance|
       instance.stop
     end
-    @docker_network.remove
+    if @docker_network then
+      @docker_network.remove
+    end
   end
 
-  def docker_network_name
-    return @subnet_config.name
-  end
-
-  def docker_network_parameters
+  def docker_network_config
     {
       IPAM: {
         Config: [{

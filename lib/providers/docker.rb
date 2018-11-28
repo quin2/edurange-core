@@ -7,6 +7,7 @@ module EDURange
     require_relative 'docker/cloud'
     require_relative 'docker/subnet'
     require_relative 'docker/instance'
+    require_relative 'docker/dockerfile'
 
     def Docker.foo(scenario_config)
       # docker library library provides global methods and is configured from ENV variables.

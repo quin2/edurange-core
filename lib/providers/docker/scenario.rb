@@ -1,4 +1,5 @@
 require_relative 'cloud'
+require 'semantic_logger'
 
 module EDURange::Docker
   class Scenario
@@ -16,6 +17,14 @@ module EDURange::Docker
       @clouds ||= @scenario_config.clouds.map do |cloud_config|
         EDURange::Docker::Cloud.new(cloud_config)
       end
+    end
+
+    def instances
+      clouds.flat_map{ |cloud| cloud.instances }
+    end
+
+    def variables
+      @scenario_config.variables
     end
 
     def started?

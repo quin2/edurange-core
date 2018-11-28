@@ -12,6 +12,10 @@ class EDURange::Docker::Cloud
     end
   end
 
+  def instances
+    subnets.flat_map{ |subnet| subnet.instances }
+  end
+
   def start
     subnets.each do |subnet|
       subnet.start

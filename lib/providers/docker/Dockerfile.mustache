@@ -1,0 +1,38 @@
+FROM phusion/baseimage:0.11
+
+CMD ["/sbin/my_init"]
+
+RUN rm -f /etc/service/sshd/down
+
+RUN sed -i "s/PasswordAuthentication\ *no/PasswordAuthentication yes/g" /etc/ssh/sshd_config
+
+RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
+
+RUN service ssh reload
+
+{{#internet_accessible?}}
+EXPOSE 22
+{{/internet_accessible?}}
+
+RUN apt-get update
+RUN apt-get install -y sudo
+
+LABEL edu.range.scenario={{instance.scenario.name}}
+LABEL edu.range.instance={{instance.name}}
+
+{{#instance.roles}}
+# installing role {{name}}
+{{#packages}}
+# installing package {{name}}
+RUN apt-get install -y --fix-missing {{name}}
+{{/packages}}
+# adds each script to /etc/my_init.d/ which will cause it to be run by /sbin/my_init on container startup.
+{{#scripts}}
+# installing script {{name}}
+COPY {{name}} /etc/my_init.d/{{name}}
+RUN chmod +x /etc/my_init.d/{{name}}
+{{/scripts}}
+
+{{/instance.roles}}
+
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

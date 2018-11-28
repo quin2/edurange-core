@@ -7,7 +7,7 @@ require 'net/ssh'
 
 # Integration test of a generic provider.
 # Implement a 'provider' and 'scenario_config' method in classes that include this module
-module ProviderTestBase
+module BasicScenarioTestBase
   #include SemanticLogger::Loggable
 
   def scenario_config
@@ -36,13 +36,13 @@ module ProviderTestBase
       Net::SSH.start(
         instance.public_ip_address.to_s,
         user.login,
-        port: instance.ssh_host_port,
+        port: instance.host_ssh_port,
         password: user.password.to_s,
         non_interactive: true
       ) do |ssh|
         # logger.info 'we connected via ssh'
-        message = ssh.exec! "cat /home/#{user.login}/message"
-        assert_equal('Hi there!', message.strip)
+        message = ssh.exec! "cat /home/#{user.login}/flag"
+        assert_equal(user.variables.flag, message.strip)
         # logger.info message.strip
       end
 #    rescue => e
