@@ -25,12 +25,12 @@ class Subnet
     self.instances = instance_hashes.map{ |instance_hash| Instance.new(self, instance_hash) }
   end
 
-  def to_hash
+  def to_h
     {
       NAME_KEY => name,
       CIDR_BLOCK_KEY => cidr_block.to_string,
       INTERNET_ACCESSIBLE_KEY => internet_accessible?,
-      INSTANCES_KEY => instances.map{ |instance| instance.to_hash }
+      INSTANCES_KEY => instances.map{ |instance| instance.to_h }
     }
   end
 

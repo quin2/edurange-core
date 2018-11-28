@@ -95,5 +95,36 @@ class ScenarioTest < Minitest::Test
     assert(!player.variables.flag.nil?)
   end
 
+  def test_instance_references
+    scenario = Scenario.new(directory, hash)
+    instance = scenario.instances.first
+    assert_equal(2, instance.roles.size) # TODO: there is only 1 role for this instance in the definition, but we add an 'implicit' role to set up edurange specific things. This is confusing, though, and maybe adding this implicit role should be done outside of the configuration core.
+    assert_equal(2, instance.scripts.size)
+    assert_equal(1, instance.users.size)
+
+
+    script = instance.scripts.first
+
+    role = instance.roles.first
+    assert_equal(1, role.scripts.size)
+  end
+
+  def test_script_templating
+    scenario = Scenario.new(directory, hash)
+    instance = scenario.instances.first
+    script = instance.scripts.first
+
+    actual = script.contents_for(instance)
+    assert(actual.include? 'useradd')
+    assert(actual.include? '--home-dir /home/james')
+  end
+
+  def test_wtf
+    scenario = Scenario.new(directory, hash)
+    instance = scenario.instances.first
+    actual = Mustache.render("{{name}}", instance)
+    assert_equal(instance.name, actual)
+  end
+
 end
 

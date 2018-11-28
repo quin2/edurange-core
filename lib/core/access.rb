@@ -13,12 +13,12 @@ class Access
     instance_name = hash[INSTANCE_KEY]
     instance = group.scenario.instances.find{ |instance| instance.name == instance_name }
     raise ArgumentError, "Group #{group.name} references non-existant Instance #{instance_name}" unless not instance.nil?
-    self.instance = instance
+    @instance = instance
     self.ip_visible = hash[IP_VISIBLE_KEY] || false
     self.administrator = hash[ADMINISTRATOR_KEY] || false
   end
 
-  def to_hash
+  def to_h
     {
       INSTANCE_KEY => instance.name,
       IP_VISIBLE_KEY => ip_visible?,
@@ -35,7 +35,7 @@ class Access
   end
 
   attr_reader :group, :instance
-  attr_writer :group, :instance, :ip_visible, :administrator
+  attr_writer :group, :ip_visible, :administrator
 
 end
 

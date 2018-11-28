@@ -1,6 +1,7 @@
 require_relative 'recipe'
 require_relative 'package'
 require_relative 'inspect'
+require_relative 'script'
 
 class Role
   include Inspect
@@ -8,18 +9,24 @@ class Role
   NAME_KEY = 'Name'
   PACKAGES_KEY = 'Packages'
   RECIPES_KEY = 'Recipes'
+  SCRIPTS_KEY = 'Scripts'
 
-  attr_reader :scenario, :name, :packages, :recipes
+  attr_reader :scenario, :name, :packages, :recipes, :scripts
 
   def initialize scenario, hash
     self.name = hash[NAME_KEY]
+
     package_names = hash[PACKAGES_KEY] || []
     self.packages = package_names.map{ |package_name| Package.new package_name }
+
     recipe_names = hash[RECIPES_KEY] || []
     self.recipes = recipe_names.map{ |recipe_name| Recipe.for_scenario scenario, recipe_name }
+
+    script_names = hash[SCRIPTS_KEY] || []
+    @scripts = script_names.map{ |script_name| Script.for_scenario scenario, script_name }
   end
 
-  def to_hash
+  def to_h
     {
       NAME_KEY => name,
       PACKAGES_KEY => packages.map{ |package| package.name },

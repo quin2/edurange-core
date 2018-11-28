@@ -8,18 +8,18 @@ class UserAccess
     @access = access
   end
 
-  delegate [:login, :password, :password_hash, :group] => :@user
+  delegate [:login, :password, :password_hash, :group, :variables] => :@user
   delegate [:ip_visible?, :administrator?, :instance] => :@access
 
-  def to_hash
+  def to_h
     {
-      'User' => @user.to_hash,
-      'Access' => @access.to_hash
+      'User' => @user.to_h,
+      'Access' => @access.to_h
     }
   end
 
   def to_s
-    to_hash.to_yaml
+    to_h.to_yaml
   end
 
   def inspect

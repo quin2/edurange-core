@@ -5,7 +5,7 @@ require_relative 'user_access'
 class Instance
   include Inspect
 
-  attr_reader :subnet, :name, :os, :ip_address, :ip_address_dynamic, :internet_accessible, :roles
+  attr_reader :subnet, :name, :os, :ip_address, :ip_address_dynamic, :internet_accessible
 
   NAME_KEY = 'Name'
   OS_KEY = 'OS'
@@ -30,7 +30,7 @@ class Instance
     end
   end
 
-  def to_hash
+  def to_h
     {
       NAME_KEY => name,
       OS_KEY => os,
@@ -47,13 +47,17 @@ class Instance
   end
 
   # TODO: start-up script is provdier aware. this shouldnt be here
-  def startup_script
+#  def startup_script
     #"#!/bin/bash\n\n" + "echo hello world;\n"
-    Pathname.new("./startup_script.sh").read
-  end
+#    Pathname.new("./startup_script.sh").read
+#  end
 
   def recipes
     roles.flat_map{ |role| role.recipes }
+  end
+
+  def scripts
+    roles.flat_map{ |role| role.scripts }
   end
 
   def packages
@@ -66,6 +70,14 @@ class Instance
 
   def scenario
     cloud.scenario
+  end
+
+  def roles
+    implicit_role = Role.new(scenario, {
+      Role::NAME_KEY    => 'ImplicitRole',
+      Role::SCRIPTS_KEY => ['add_players']
+    })
+    [implicit_role] + @roles
   end
 
   def access

@@ -21,11 +21,11 @@ class Cloud
     self.subnets = subnet_hash_list.map{ |subnet_hash| Subnet.new self, subnet_hash }
   end
 
-  def to_hash
+  def to_h
     {
       NAME_KEY => name,
       CIDR_BLOCK_KEY => cidr_block.to_string,
-      SUBNETS_KEY => subnets.map{|subnet| subnet.to_hash}
+      SUBNETS_KEY => subnets.map{|subnet| subnet.to_h}
     }
   end
 

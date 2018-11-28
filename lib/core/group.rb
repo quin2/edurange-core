@@ -1,6 +1,7 @@
 require_relative 'access'
 require_relative 'user'
 require_relative 'inspect'
+require_relative 'variable'
 
 class Group
   include Inspect
@@ -47,12 +48,12 @@ class Group
     #group
   end
 
-  def to_hash
+  def to_h
     {
       NAME_KEY => name,
       INSTRUCTIONS_KEY => instructions,
-      ACCESS_KEY => access.map{ |a| a.to_hash },
-      USERS_KEY => users.map{ |a| a.to_hash }
+      ACCESS_KEY => access.map{ |a| a.to_h },
+      USERS_KEY => users.map{ |a| a.to_h }
     }
   end
 

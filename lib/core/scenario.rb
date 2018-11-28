@@ -13,7 +13,7 @@ require_relative 'inspect'
 class Scenario
   include Inspect
 
-  attr_reader :directory, :name, :description, :instructions, :instructions_student, :roles, :clouds, :groups
+  attr_reader :directory, :name, :description, :instructions, :instructions_student, :roles, :clouds, :groups, :variables
 
   NAME_KEY = 'Name'
   DESCRIPTION_KEY = 'Description'
@@ -22,6 +22,7 @@ class Scenario
   ROLES_KEY = 'Roles'
   CLOUDS_KEY = 'Clouds'
   GROUPS_KEY = 'Groups'
+  VARIABLES_KEY = 'Variables'
 
   def initialize directory, hash
     self.directory = Pathname.new directory
@@ -35,6 +36,11 @@ class Scenario
     self.clouds = cloud_hashes.map{ |cloud_hash| Cloud.new self, cloud_hash }
     group_hashes = hash[GROUPS_KEY] || []
     self.groups = group_hashes.map{ |group_hash| Group.from_hash self, group_hash }
+    variables_hashes = hash[VARIABLES_KEY] || []
+    @variables = OpenStruct.new(Hash[variables_hashes.collect do |var_h|
+      var = Variable.from_hash(var_h)
+      [var.name, var.value]
+    end])
   end
 
   def self.load_from_yaml_file filename
@@ -44,15 +50,15 @@ class Scenario
     Scenario.new directory, hash
   end
 
-  def to_hash
+  def to_h
     {
       NAME_KEY => name,
       DESCRIPTION_KEY => description,
       INSTRUCTIONS_KEY => instructions,
       INSTRUCTIONS_STUDENT_KEY => instructions_student,
-      ROLES_KEY => roles.map{ |role| role.to_hash },
-      CLOUDS_KEY => clouds.map{ |cloud| cloud.to_hash },
-      GROUPS_KEY => groups.map{ |group| group.to_hash }
+      ROLES_KEY => roles.map{ |role| role.to_h },
+      CLOUDS_KEY => clouds.map{ |cloud| cloud.to_h },
+      GROUPS_KEY => groups.map{ |group| group.to_h }
     }
   end
 
@@ -68,7 +74,7 @@ class Scenario
     groups.flat_map{ |group| group.players }
   end
 
-  private :to_hash
+  private :to_h
   private
 
   def directory= dir

@@ -1,9 +1,9 @@
 
-# uses objects to_hash method for pretty inspect
+# uses objects to_ha method for pretty inspect
 module Inspect
 
   def inspect
-    to_hash.to_yaml
+    to_h.to_yaml
   end
 
 end

@@ -36,7 +36,7 @@ class User
     "#{login}:#{password}"
   end
 
-  def to_hash
+  def to_h
     {
       LOGIN_KEY => login,
       PASSWORD_KEY => password.to_s
