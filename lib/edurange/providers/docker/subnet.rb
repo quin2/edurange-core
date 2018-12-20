@@ -1,5 +1,5 @@
-require 'providers/logging/instance'
-require 'providers/logging/subnet'
+require 'edurange/providers/logging/instance'
+require 'edurange/providers/logging/subnet'
 
 require 'semantic_logger'
 

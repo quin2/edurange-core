@@ -1,6 +1,6 @@
 require_relative '../test_helper.rb'
 
-require 'core/scenario'
+require 'edurange/core/scenario'
 require 'logging'
 
 require 'net/ssh'

@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-require 'core/variable'
+require 'edurange/core/variable'
 
 class VariableTest < Minitest::Test
 

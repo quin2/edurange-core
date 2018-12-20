@@ -1,7 +1,7 @@
 
 require_relative '../test_helper'
 
-require 'core/scenario'
+require 'edurange/core/scenario'
 require 'pathname'
 require 'yaml'
 

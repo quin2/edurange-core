@@ -1,6 +1,6 @@
 require_relative '../test_helper.rb'
-require 'core/script'
-require 'core/scenario'
+require 'edurange/core/script'
+require 'edurange/core/scenario'
 require 'mustache'
 
 class ScriptTest < MiniTest::Test

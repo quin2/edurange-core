@@ -1,7 +1,7 @@
 require_relative '../../test_helper'
-require 'core/scenario'
+require 'edurange/core/scenario'
 
-require 'providers/docker/instance_image'
+require 'edurange/providers/docker/instance_image'
 
 class DockerTest < Minitest::Test
 

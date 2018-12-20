@@ -1,4 +1,4 @@
-require 'providers/logging/subnet'
+require 'edurange/providers/logging/subnet'
 
 class EDURange::Docker::Cloud
 
