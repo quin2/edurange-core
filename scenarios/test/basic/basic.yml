@@ -2,6 +2,10 @@ Name: Barebones
 Description: 'A very basic scenario.'
 Instructions: 'No instructions'
 InstructionsStudent: 'No instructions'
+Roles:
+- Name: DefaultInstanceRole
+  Scripts:
+  - set_flag
 Groups:
 - Name: DefaultGroup
   Users:
@@ -11,6 +15,9 @@ Groups:
   - Instance: DefaultInstance
     Administrator: true
     IP_Visible: true
+  Variables:
+  - Name: flag
+    Type: random
 Clouds:
 - Name: DefaultCloud
   CIDR_Block: 10.0.0.0/24
@@ -23,3 +30,5 @@ Clouds:
       OS: ubuntu
       IP_Address: 10.0.0.6
       Internet_Accessible: true
+      Roles:
+      - DefaultInstanceRole

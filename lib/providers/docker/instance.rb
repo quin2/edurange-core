@@ -70,10 +70,17 @@ class EDURange::Docker::Instance
     end
   end
 
-  # TODO, should weird internals be exposed? for debugging, they seem useful.
-  def with_docker_build_directory(&block)
-    EDURange::Docker::InstanceImage.with_docker_build_directory(self, &block)
+  def create_build_directory(path)
+    EDURange::Docker::InstanceImage.create_build_directory(path, self)
   end
+
+
+  # TODO, should weird internals be exposed? for debugging, they seem useful.
+#  def with_docker_build_directory(&block)
+#    EDURange::Docker::InstanceImage.with_docker_build_directory(self, &block)
+#  end
+
+
 
 end
 

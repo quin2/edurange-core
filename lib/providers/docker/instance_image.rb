@@ -22,39 +22,39 @@ module EDURange::Docker
 
       def self.build instance
         logger.trace 'building image', instance: instance.name
-        InstanceImage.with_docker_build_directory instance do |dir|
-          Docker::Image.build_from_dir(dir.to_path, t: instance.name.downcase) # t is the image 'tag'
-        end
-      end
-
-      def self.with_docker_build_directory instance
         tmp_dir_prefix = "edurange_docker_image_for_#{instance.name}_"
         Dir.mktmpdir tmp_dir_prefix do |dir|
           tmp_path = Pathname.new(dir)
-
-          # add script files to tmp directory
-          instance.scripts.each do |script|
-            logger.trace(event: 'installing_script', script: script.name)
-            script_path = tmp_path + script.name
-            script_path.open('w') do |script_file|
-              contents = script.contents_for instance
-              # kind of ugly to have this here.
-              if contents.include? "\r" then
-                raise "script '#{script.name}' contains windows carriage returns"
-              end
-              script_file.write(contents)
-            end
-          end
-
-          # add dockerfile to tmp directory
-          dockerfile_path = tmp_path + 'Dockerfile'
-          dockerfile_path.open('w') do |dockerfile|
-            dockerfile.write(dockerfile_contents instance)
-          end
+          InstanceImage.create_build_directory(tmp_path, instance)
 
           # build image from tmp directory
-          yield tmp_path
+          Docker::Image.build_from_dir(dir, t: instance.name.downcase) # t is the image 'tag'
         end
       end
+
+      # Add files to a directory to be used as a docker context to build an image for this instance.
+      def self.create_build_directory(path, instance)
+        path.mkdir if not path.exist?
+        # add script files to directory
+        instance.scripts.each do |script|
+          logger.trace(event: 'installing_script', script: script.name)
+          script_path = path + script.name
+          script_path.open('w') do |script_file|
+            contents = script.contents_for instance
+            # kind of ugly to have this here.
+            if contents.include? "\r" then
+              raise "script '#{script.name}' contains windows carriage returns"
+            end
+            script_file.write(contents)
+          end
+        end
+
+        # add dockerfile to directory
+        dockerfile_path = path + 'Dockerfile'
+        dockerfile_path.open('w') do |dockerfile|
+          dockerfile.write(dockerfile_contents instance)
+        end
+      end
+
     end
 end

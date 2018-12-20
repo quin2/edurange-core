@@ -33,7 +33,12 @@ class Group
     @users = user_hashes.map{ |user_hash| User.new self, user_hash }
 
     variable_hashes = hash[VARIABLES_KEY] || []
-    @variables = variable_hashes.map{ |variable_hash| Variable.from_hash(variable_hash) }
+    if variable_hashes.class == [].class then
+      @variables = variable_hashes.map{ |variable_hash| Variable.from_hash(variable_hash) }
+    else
+      warn 'Skipping variables because you are using old syntax.'
+      @variables = []
+    end
   end
 
   def self.from_hash scenario, hash

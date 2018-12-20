@@ -1,6 +1,7 @@
 require 'yaml'
 require 'securerandom'
 require 'pathname'
+require 'ostruct'
 
 # extend object with fancy active support method `blank?`
 require 'active_support/core_ext/object/blank'
@@ -116,6 +117,20 @@ class Scenario
   def groups= groups
     raise ArgumentError, "Scenario '#{GROUPS_KEY}' must not be empty" if groups.blank?
     @groups = groups
+  end
+
+
+  def self.all
+    scenarios_dir = Pathname.new('./scenarios')
+
+    ['development', 'production', 'test'].flat_map do |maturity|
+      dir = scenarios_dir + maturity
+      possible_scenarios = scenario_files = dir.each_child.map do |child|
+        child + child.basename.sub_ext('.yml')
+      end
+      possible_scenarios.select { |path| path.file? }.map { |path| Scenario.load_from_yaml_file path}
+    end
+
   end
 
 end

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+{{#users}}
+cd /home/{{login}}
+echo {{variables.flag}} > flag
+chown {{login}}:{{login}} flag
+{{/users}}

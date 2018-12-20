@@ -74,8 +74,9 @@ class Instance
 
   def roles
     implicit_role = Role.new(scenario, {
-      Role::NAME_KEY    => 'ImplicitRole',
-      Role::SCRIPTS_KEY => ['add_players']
+      Role::NAME_KEY     => 'ImplicitRole',
+      Role::SCRIPTS_KEY  => ['add_players'],
+      Role::PACKAGES_KEY => ['man']
     })
     [implicit_role] + @roles
   end

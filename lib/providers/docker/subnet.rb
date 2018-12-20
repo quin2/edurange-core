@@ -62,7 +62,5 @@ class EDURange::Docker::Subnet
     }
   end
 
-  #private :docker_network_name
-
 end
 

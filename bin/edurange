@@ -30,10 +30,12 @@ when 'start' then
 when 'stop' then
   scenario.stop
 when 'export'
-  instance = scenario.instances.select{|i| i.name == ARGV[2] }.first
-  instance.with_docker_build_directory do |dir|
-    puts dir.to_path
-    FileUtils.copy_entry(dir.to_path, "./#{instance.name}")
+  scenario_dir = Pathname.new("./#{scenario.name}")
+  scenario_dir.mkdir if not scenario_dir.exist?
+
+  scenario.instances.each do |instance|
+    instance_dir = scenario_dir + instance.name
+    instance.create_build_directory(instance_dir)
   end
 else
   puts usage
