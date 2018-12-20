@@ -126,5 +126,19 @@ class ScenarioTest < Minitest::Test
     assert_equal(instance.name, actual)
   end
 
+  def test_find_all
+    Scenario.all
+  end
+
+  def test_find_by_name
+    scenario = Scenario.find_by_name 'Barebones'
+    assert scenario
+    assert_equal 'Barebones', scenario.name
+
+    non_scenario = Scenario.find_by_name 'ImprobableScenarioName'
+    assert non_scenario.nil?
+
+  end
+
 end
 

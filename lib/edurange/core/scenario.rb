@@ -119,18 +119,22 @@ class Scenario
     @groups = groups
   end
 
+  # A scenario stored locally given by +name+
+  def self.find_by_name name
+    self.all.select{ |scenario| scenario.name == name }.first
+  end
 
+  # A list of all scenarios stored locally.
   def self.all
     scenarios_dir = Pathname.new('./scenarios')
 
     ['development', 'production', 'test'].flat_map do |maturity|
       dir = scenarios_dir + maturity
-      possible_scenarios = scenario_files = dir.each_child.map do |child|
+      possible_scenarios = dir.each_child.map do |child|
         child + child.basename.sub_ext('.yml')
       end
       possible_scenarios.select { |path| path.file? }.map { |path| Scenario.load_from_yaml_file path}
     end
-
   end
 
 end
