@@ -23,6 +23,10 @@ module EDURange::Docker
       @scenario_config.name
     end
 
+    def description
+      @scenario_config.description
+    end
+
     def instances
       clouds.flat_map{ |cloud| cloud.instances }
     end
