@@ -60,26 +60,45 @@ class EDURange::Docker::Subnet
     end
   end
 
-  def started?
+  def docker_network_started?
     !find_existing_docker_network.nil?
   end
 
-  def start
-    docker_network = find_existing_docker_network || create_docker_network
+  def all_instances_started?
+    instances.all? { |i| i.started? }
+  end
 
+  def started?
+    docker_network_started? and all_instances_started?
+  end
+
+  def start
+    find_existing_docker_network || create_docker_network
+    start_instances
+  end
+
+  def start_instances
     instances.each do |instance|
       instance.start
     end
   end
 
-  def stop
+  def stop_instances
     instances.each do |instance|
       instance.stop
     end
+  end
+
+  def remove_network
     docker_network = find_existing_docker_network
     if docker_network then
       docker_network.remove
     end
+  end
+
+  def stop
+    stop_instances
+    remove_network
   end
 
 end

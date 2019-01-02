@@ -35,6 +35,11 @@ class EDURange::Docker::Instance
 
   # TODO: refactor image and container stuff into separate class. instance can coordinate between them.
 
+  def started?
+    container = EDURange::Docker::InstanceContainer.find(@instance_config)
+    not container.nil? and container.info["State"] == 'running'
+  end
+
   def start
     logger.trace 'building_image', instance: name
     @image = EDURange::Docker::InstanceImage.build(@instance_config) unless @image

@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
 
   # Docker provider specific files
   s.add_runtime_dependency 'docker-api', '1.34.2'
-  
+
   # Development Dependencies
   s.add_development_dependency 'net-ssh', '5.0.2'
   s.add_development_dependency 'minitest-reporters'
