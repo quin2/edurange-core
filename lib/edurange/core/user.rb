@@ -29,7 +29,7 @@ class User
   # user specific variables
   def variables
     # NOTE: this has potentially unexpected behavior: this is where player variables are "instantiated"
-    @variables ||= OpenStruct.new(Hash[group.variables.collect { |var| [var.name, var.value] }])
+    @variables ||= OpenStruct.new(Hash[group.variables.collect { |var| [var.name, var.generate_value] }])
   end
 
   def to_s

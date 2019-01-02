@@ -61,7 +61,7 @@ class Instance
   end
 
   def packages
-    roles.flat_map{ |role| role.recipe }
+    roles.flat_map{ |role| role.packages }
   end
 
   def cloud

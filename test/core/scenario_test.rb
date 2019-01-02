@@ -84,15 +84,15 @@ class ScenarioTest < Minitest::Test
 
   def test_players
     scenario = Scenario.new(directory, hash)
-    player = scenario.players.first
-    assert_equal('james', player.login)
-    assert_equal('s00p3rs3cr37', player.password.to_s)
+    user = scenario.users.first
+    assert_equal('james', user.login)
+    assert_equal('s00p3rs3cr37', user.password.to_s)
   end
 
-  def test_player_variable_set
+  def test_users_variable_set
     scenario = Scenario.new(directory, hash)
-    player = scenario.players.first
-    assert(!player.variables.flag.nil?)
+    user = scenario.users.first
+    assert(!user.variables.flag.nil?)
   end
 
   def test_instance_references
@@ -137,6 +137,15 @@ class ScenarioTest < Minitest::Test
 
     non_scenario = Scenario.find_by_name 'ImprobableScenarioName'
     assert non_scenario.nil?
+
+  end
+
+  def test_user_variable
+    scenario = Scenario.find_by_name 'Barebones'
+    user = scenario.users.first
+    a = user.variables.flag
+    b = user.variables.flag
+    assert_equal(a, b)
 
   end
 

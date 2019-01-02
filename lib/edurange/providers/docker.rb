@@ -9,7 +9,7 @@ module EDURange
     require_relative 'docker/instance'
     require_relative 'docker/dockerfile'
 
-    def Docker.foo(scenario_config)
+    def Docker.wrap(scenario_config)
       # docker library library provides global methods and is configured from ENV variables.
       Scenario.new(scenario_config)
     end

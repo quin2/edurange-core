@@ -3,7 +3,7 @@ require 'openssl'
 # adapted from https://github.com/edurange/edurange-server/blob/1f693bb2fdd5ab6ca29d494b87cf26c9ae73e349/lib/variable.rb
 
 class Variable
-  attr_reader :name, :type
+  attr_reader :name, :type, :value
 
   # TODO since the rules for name are the same everywhere, DRY it up.
   def self.validate_name name
@@ -26,7 +26,7 @@ class Variable
   end
 
   # NOTE: this is non deterministic, it will potentially return a completely different value on different calls.
-  def value
+  def generate_value
     # TODO: switching on type is a code smell. These are really different subclasses of a variables class.
     case type
     when 'string'
@@ -40,11 +40,17 @@ class Variable
     end
   end
 
+  def instantiate
+    Variable.new(name, type, generate_value)
+  end
+
   def initialize(name, type, value)
     @name = Variable.validate_name(name)
     @type = Variable.validate_type(type)
     @value = Variable.validate_value(type, value)
   end
+
+  # to and from serialized object
 
   NAME_KEY = 'Name'
   VALUE_KEY = 'Value'

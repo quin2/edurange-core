@@ -54,8 +54,9 @@ class VariableTest < Minitest::Test
       Variable::TYPE_KEY => 'random'
     })
 
-    assert(!variable.value.nil?)
-    assert_equal(8, variable.value.length)
+    assert(variable.value.nil?)
+    assert(!variable.generate_value.nil?)
+    assert_equal(8, variable.generate_value.length)
   end
 
   def test_openssl_pkey_rsa
@@ -64,8 +65,9 @@ class VariableTest < Minitest::Test
       Variable::TYPE_KEY => 'openssl_pkey_rsa'
     })
 
-    assert(!variable.value.nil?)
-    assert(variable.value.start_with? '-----BEGIN RSA PRIVATE KEY-----')
+    assert(variable.value.nil?)
+    assert(!variable.generate_value.nil?)
+    assert(variable.generate_value.start_with? '-----BEGIN RSA PRIVATE KEY-----')
   end
 
 end

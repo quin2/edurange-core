@@ -37,11 +37,11 @@ class EDURange::Docker::Instance
 
   def start
     logger.trace 'building_image', instance: name
-    @image = EDURange::Docker::InstanceImage.build(@instance_config)
+    @image = EDURange::Docker::InstanceImage.build(@instance_config) unless @image
     logger.trace 'pushing_image', instance: name
     @image.push
 
-    @container = EDURange::Docker::InstanceContainer.create(@image, @instance_config)
+    @container = EDURange::Docker::InstanceContainer.create(@image, @instance_config) unless @container
     logger.trace 'starting container', instance: name
     @container.start
   end

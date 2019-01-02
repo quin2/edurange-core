@@ -15,7 +15,7 @@ module BasicScenarioTestBase
   end
 
   def test_all
-    scenario = provider.foo(scenario_config)
+    scenario = provider.wrap(scenario_config)
     assert_respond_to(scenario, :start)
     assert_respond_to(scenario, :stop)
 
@@ -60,19 +60,26 @@ module BasicScenarioTestBase
   end
 
   def test_reattach_scenario
-    skip
     # a scenario that has been started should be able to be reattched to
 
-    initial_scenario = provider.foo(scenario_config)
-    initial_scenario.start
+    initial_scenario = provider.wrap(scenario_config)
 
-    reattached_scenario = provider.foo(scenario_config)
+    assert(!initial_scenario.started?)
+    initial_scenario.start
+    assert(initial_scenario.started?)
+
+    reattached_scenario = provider.wrap(scenario_config)
     assert(reattached_scenario.started?)
+
+    # scenario start should be idempotent.
+    reattached_scenario.start
+
     #assert_equals(initial_scenario, reattached_scenario)
 
     reattached_scenario.stop
 
-    assert(!reattached_scenarion.started?)
+    assert(!reattached_scenario.started?)
+    assert(!initial_scenario.started?)
   end
 
 end

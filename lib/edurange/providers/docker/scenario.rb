@@ -32,7 +32,7 @@ module EDURange::Docker
     end
 
     def started?
-      clouds.add? { |cloud| started? }
+      clouds.all? { |cloud| cloud.started? }
     end
 
     def start
