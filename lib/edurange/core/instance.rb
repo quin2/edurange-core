@@ -52,6 +52,13 @@ class Instance
 #    Pathname.new("./startup_script.sh").read
 #  end
 
+# TODO: start-up script is provdier aware. this shouldnt be here
+      #(hacked in by Quinn )
+      def startup_script
+        "#!/bin/bash\n\n" + "echo hello world;\n"
+        Pathname.new("./startup_script.sh").read
+      end
+
   def recipes
     roles.flat_map{ |role| role.recipes }
   end

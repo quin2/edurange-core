@@ -16,7 +16,7 @@ module EDURange
         @instance = Instance.preexisting_aws_instance(ec2, self)
       end
 
-      delegate [:name, :os, :ip_address, :ip_address_dynamic, :users, :administrators, :recipes, :packages, :cloud, :scenario, :subnet, :internet_accessible?, :roles] => :@config
+      delegate [:name, :os, :ip_address, :ip_address_dynamic, :users, :administrators, :recipes, :packages, :startup_script, :cloud, :scenario, :subnet, :internet_accessible?, :roles] => :@config
 
       # a globally unique identifier for this EduRange instance.
       def identifier
@@ -34,6 +34,7 @@ module EDURange
           cloud: @config.cloud.name,
           subnet: @config.subnet.name,
           instance: @config.name
+          #startup_script: @config.startup_script.name
 
         @instance = Instance.create_instance(@config, subnet, status_s3_object_put_url)
 
@@ -122,7 +123,7 @@ module EDURange
           private_ip_address: config.ip_address.to_s,
           max_count: 1,
           min_count: 1,
-          instance_type: 't1.micro', # TODO, also shouldn't be hardcoded?
+          instance_type: 't1.micro', # TODO, also shouldn't be hardcoded? 
           user_data: Base64.encode64(config.startup_script.gsub("{{status_object_url}}", status_object_url)), # todo use actual templates eventually.
 #          key_name: key_name
         }).first

@@ -1,5 +1,6 @@
 require_relative 'basic_scenario_test_base'
-require 'providers/aws'
+require 'edurange/providers/aws'
+require 'edurange/core/scenario'
 
 class AWSBasicScenarioTest < Minitest::Test
   include BasicScenarioTestBase

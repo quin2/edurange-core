@@ -1,5 +1,5 @@
 require_relative '../../test_helper'
-require 'edurange/core/scenario'
+#require 'edurange/core/scenario'
 
 require 'edurange/providers/docker/instance_image'
 
