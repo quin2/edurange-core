@@ -114,7 +114,7 @@ module EDURange
          logger.trace "Creating s3 bucket..."
          bucket = s3.bucket('edurange-playground')
          bucket.create() if not bucket.exists?
-         obj = bucket.object('status-' + SecureRandom.uuid)# TODO, needs to be unique identifier for this scenario/instance
+         obj = bucket.object('status')# TODO, needs to be unique identifier for this scenario/instance
          obj 
       end
 
