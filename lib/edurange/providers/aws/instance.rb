@@ -50,11 +50,22 @@ module EDURange
         @instance.load
 
         # TODO weird and hacky, this status stuff should be in it's own class not literring this one
-        while not status_s3_object.exists? #might be issues with s3 auth...
+        #see: https://github.com/aws/aws-sdk-ruby/issues/201
+        exsist = false
+        obj = status_s3_object
+        while not exsist 
+          begin
+            exsist = obj.exists? #true
+            logger.trace "object is here"
+          rescue
+            exsist = false #false
+            logger.trace "object is not here"
+          end
+
           duration = 15
           logger.trace "waiting #{duration}s for status page"
           sleep(duration)
-        end
+        end    
 
         logger.info event: 'instance_started',
           scenario: @config.scenario.name,
@@ -103,7 +114,7 @@ module EDURange
          logger.trace "Creating s3 bucket..."
          bucket = s3.bucket('edurange-playground')
          bucket.create() if not bucket.exists?
-         obj = bucket.object('status') # TODO, needs to be unique identifier for this scenario/instance
+         obj = bucket.object('status-' + SecureRandom.uuid)# TODO, needs to be unique identifier for this scenario/instance
          obj 
       end
 
