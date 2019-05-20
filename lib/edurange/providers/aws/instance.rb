@@ -50,7 +50,7 @@ module EDURange
         @instance.load
 
         # TODO weird and hacky, this status stuff should be in it's own class not literring this one
-        while not status_s3_object.exists?
+        while not status_s3_object.exists? #might be issues with s3 auth...
           duration = 15
           logger.trace "waiting #{duration}s for status page"
           sleep(duration)
@@ -96,13 +96,15 @@ module EDURange
       end
 
       def status_s3_object_put_url
-        status_s3_object.presigned_url(:put)
+        status_s3_object.presigned_url(:put)  
       end
 
       def Instance.status_s3_object s3
+         logger.trace "Creating s3 bucket..."
          bucket = s3.bucket('edurange-playground')
          bucket.create() if not bucket.exists?
-         bucket.object('status') # TODO, needs to be unique identifier for this scenario/instance
+         obj = bucket.object('status') # TODO, needs to be unique identifier for this scenario/instance
+         obj 
       end
 
       # retrieves instance from subnet with correct name.
@@ -123,7 +125,7 @@ module EDURange
           private_ip_address: config.ip_address.to_s,
           max_count: 1,
           min_count: 1,
-          instance_type: 't1.micro', # TODO, also shouldn't be hardcoded? 
+          instance_type: 't2.small', # smallest available in Oregon datacenter 
           user_data: Base64.encode64(config.startup_script.gsub("{{status_object_url}}", status_object_url)), # todo use actual templates eventually.
 #          key_name: key_name
         }).first
